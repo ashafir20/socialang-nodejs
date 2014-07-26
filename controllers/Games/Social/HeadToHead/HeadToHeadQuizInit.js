@@ -24,7 +24,17 @@ exports.LaunchHeadToHeadQuizGame = function (gameRoomID, callback) {
                 callback(false, null);
             }
        });
+}
 
+
+exports.RemoveGame = function (gameRoomID) {
+    HeadToHeadModel.remove({'GameRoomID': gameRoomID}, function (error) {
+        if(error){
+            console.log('error removing game from database in hostQuitGameNotification'.error);
+        } else{
+            console.log('an open game was removed from database'.silly);
+        }
+    });
 }
 
 exports.SetGameState = function (gameRoomID, gameState) {

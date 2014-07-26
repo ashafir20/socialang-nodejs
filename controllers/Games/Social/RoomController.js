@@ -161,7 +161,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
         console.log('inside HostQuitGameNotification. removing game from database...'.silly);
         getVariableFromSocket('gameRoomID', function (gameRoomID) {
             if(req.GameType == 'HeadToHeadQuizGame') {
-                HeadToHeadQuizInit.RemoveHeadToHeadGame(gameRoomID);
+                HeadToHeadQuizInit.RemoveGame(gameRoomID);
                 jsonResponse = { result: "OK"};
                 socket.broadcast.to(RoomPrefixes.HeadToHead + gameRoomID).emit('playerQuitGameNotificationResponse', jsonResponse);
             }
