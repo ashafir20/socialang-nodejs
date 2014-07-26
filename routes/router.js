@@ -24,7 +24,7 @@ exports.initialize = function(server) {
         require('../controllers/Games/Social/RoomController').GamesRoomRoutesHandler(socket, io);
         require('../controllers/Games/Social/HeadToHead/HeadToHeadQuizPlay').HeadToHeadQuizGameRoutesHandler(socket, io);
         require('../controllers/Games/Social/StudentTeacherGame/StudentTeacherLessonController').StudentTeacherGameHandler(socket, io);
-
+        require('../controllers/Games/Social/MemoryGame/MemoryGamePlay').MemoryGameRoutesHandler(socket, io);
 
         require('../controllers/Games/Social/GamesListController').WaitingGamesListHandler(socket);
         require('../controllers/Chat/Chat').ChatHandler(socket, io);
