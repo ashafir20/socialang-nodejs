@@ -1,10 +1,46 @@
 var io = require('socket.io');
 var mongoose = require('mongoose');
 var HeadToHeadModel = mongoose.model("HeadToHead");
-//var fileServer = require('../controllers/General/FileServer');
+
+//setting the proxy server
+var util = require('util');
+var http = require('http');
+var httpProxy = require('http-proxy');
+
 
 exports.initialize = function(server) {
+
     io = io.listen(server);
+
+    //
+    // Create a proxy server with node-http-proxy
+    //
+    //
+    // Setup our server to proxy standard HTTP requests
+    //
+/*    //-----------------------------------------------------------
+    var proxy = new httpProxy.createProxyServer({
+      target: {
+        host: 'localhost',
+        port: 7878
+      }
+    });
+
+    var proxyServer = http.createServer(function (req, res) {
+      proxy.web(req, res);
+    });
+
+    proxyServer.on('upgrade', function (req, socket, head) {
+      proxy.ws(req, socket, head);
+    });
+
+   proxyServer.listen(7979); 
+    
+//-----------------------------------------------------------*/
+
+    io.configure(function () { 
+      io.set("transports", ["xhr-polling"]);
+    });
 
     io.sockets.on('connection', function (socket) {
         console.log('SocketIO connection Established!');

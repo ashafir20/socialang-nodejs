@@ -16,7 +16,7 @@ colors.setTheme({
 });
 
 
-var PORT = process.env.PORT || 8000;
+var PORT = process.env.PORT || 7878;
 
 var app = express();
 var server = app.listen(PORT);
@@ -34,6 +34,7 @@ app.configure(function() {
 app.configure('development', function(){
     app.use(express.errorHandler());
 });
+
 
 console.log("socialang server listening on port " + PORT);
 
