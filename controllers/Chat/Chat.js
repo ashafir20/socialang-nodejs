@@ -5,48 +5,25 @@ var RoomPrefixes = {
 }
 
 exports.ChatHandler = function (socket, io) {
-
-	socket.on("addUserToChat", function (data) {
-		console.log("in addUserToChat function");
+	socket.on('chatMessage', function (data){
+		console.log("in chatMessage");
 		console.log(data);
 		socket.get('gameRoomID', function (err, gameRoomID) {
 		 	if(err){
 		 		console.log("Error in getting the game room ID - chatting not OK");
-		 	} else if(gameRoomID) { 
-		 		console.log("Found game room id, chatting - OK");
-		 		if(data.GameType == "HeadToHeadQuizGame") {
-	 				socket.join("chat" + RoomPrefixes.HeadToHead + gameRoomID);
-		 		} else if(data.GameType == "MemoryGame") {
-		 			socket.join("chat" + RoomPrefixes.MemoryGame + gameRoomID);
-		 		}
 		 	}
-		 	else{
-		 		console.log("Error in getting the game room ID - could not find gameRoomID");
-		 	}
-		 });
-	});
-		
-	socket.on('message', function (data){
-		console.log(data);
-		socket.get('gameRoomID', function (err, gameRoomID) {
-		 	if(err)
-		 	{
-		 		console.log("Error in getting the game room ID - chatting not OK");
-		 	}
-		 	else if(gameRoomID)
-		 	{
+		 	else if(gameRoomID){
 		 		if(data.GameType == "HeadToHeadQuizGame"){
 			 		console.log("Recives Message: " + data.message);
-			 		console.log("Emitting Message to room: " + "chat" + RoomPrefixes.HeadToHead + gameRoomID);
-					io.sockets.in("chat" + RoomPrefixes.HeadToHead + gameRoomID);
+			 		console.log("Emitting Message to room: " + RoomPrefixes.HeadToHead + gameRoomID);
+					io.sockets.in(RoomPrefixes.HeadToHead + gameRoomID).emit("chatMessageResponse", data);
 		 		} else if(data.GameType == "MemoryGame"){
 			 		console.log("Recives Message: " + data.message);
-			 		console.log("Emitting Message to room: " + "chat" + RoomPrefixes.MemoryGame + gameRoomID);
-					io.sockets.in("chat" + RoomPrefixes.MemoryGame + gameRoomID).emit("newChatMessage", data);
+			 		console.log("Emitting Message to room: " + RoomPrefixes.MemoryGame + gameRoomID);
+					io.sockets.in(RoomPrefixes.MemoryGame + gameRoomID).emit("chatMessageResponse", data);
 		 		}
 			}
-			else
-			{
+			else{
 				console.log("Error in getting the game room ID - could not find gameRoomID");
 			}
 		});
