@@ -39,7 +39,7 @@ exports.initialize = function(server) {
 //-----------------------------------------------------------*/
 
     io.configure(function () { 
-      io.set("transports", ["xhr-polling"]);
+      io.set("transports", ["websocket", "xhr-polling"]);
       io.set("polling duration", 10);
     });
 
