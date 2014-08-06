@@ -1,6 +1,7 @@
 var express = require('express');
 var db = require('./data/db');
 var colors = require('colors');
+var http = require('http');
 
 colors.setTheme({
     silly: 'yellow',
@@ -15,11 +16,13 @@ colors.setTheme({
     error: 'red'
 });
 
-
-var PORT = process.env.PORT || 7979;
-
 var app = express();
-var server = app.listen(PORT);
+
+var osipaddress = process.env.OPENSHIFT_NODEJS_IP;
+var osport = process.env.OPENSHIFT_NODEJS_PORT;
+
+app.set('port', osport || 3000);
+app.set('ipaddress', osipaddress);
 
 app.configure(function() {
     app.use(express.favicon());
@@ -35,8 +38,11 @@ app.configure('development', function(){
     app.use(express.errorHandler());
 });
 
+var server = http.createServer(app);
 
-console.log("socialang server listening on port " + PORT);
+server.listen(app.get('port'), app.get('ipaddress'), function(){
+    console.log('Express server listening on port ' + app.get('port'));
+});
 
 //SOCKET.IO INITIALIZE
 var router = require('./routes/router.js');
