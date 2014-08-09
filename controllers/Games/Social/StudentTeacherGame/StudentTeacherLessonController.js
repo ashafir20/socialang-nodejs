@@ -23,6 +23,14 @@ exports.StudentTeacherGameHandler = function(socket, io) {
     	
     });
 
+    socket.on('showImage', function(data) {
+        getVariableFromSocket('gameRoomID', function (gameRoomID) {
+            var jsonResponse = {image : data.image, word : data.word}
+            io.sockets.in(RoomPrefix + gameRoomID).emit('showImageResponse', jsonResponse);
+        });
+        
+    });
+
 	function getVariableFromSocket(key, callback) {
         socket.get(key, function (err, key) {
             console.log(key);

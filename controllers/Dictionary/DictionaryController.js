@@ -9,6 +9,12 @@ exports.getRandomWord = function(callback)
     callback(word);
 };
 
+exports.getRandomPictureWord = function(callback)
+{
+    var word = myDict.pictureword();
+    callback(word);
+};
+
 function getFourWords(callback)
 {
     var wordArr = [];

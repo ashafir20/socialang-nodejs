@@ -11,8 +11,6 @@ var quizGameSchema = mongoose.Schema({
     LastCorrectAnswer : String
 });
 
-
-// instance methods
 quizGameSchema.methods.answerLastQuestion = function(answer, cb) {
     if (answer == this.LastCorrectAnswer) {
         this.NumOfCorrectAnswered++;
@@ -26,7 +24,7 @@ quizGameSchema.methods.answerLastQuestion = function(answer, cb) {
         });
     }
     else {
-        cb(false,answer);
+        cb(false,this.LastCorrectAnswer);
     }
 };
 
