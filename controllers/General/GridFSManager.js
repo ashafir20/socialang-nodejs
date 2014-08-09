@@ -7,13 +7,12 @@ var zlib = require('zlib');
 var dc = require('../Dictionary/DictionaryController');
 //var sleep = require('sleep');
 
-
-var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
+var dbGoogleImagesDatabaseUrl = 'mongodb://social:inter4ever@kahana.mongohq.com:10075/SociaLang-GoogleImagesDatabase'
 
 exports.GetImageByName = function (socket) {
         socket.on('getImage', function (filename) {
         var gfs;
-        var conn = mongoose.createConnection(dburl);
+        var conn = mongoose.createConnection(dbGoogleImagesDatabaseUrl);
         conn.once('open', function () {
             gfs = Grid(conn.db);
             dc.TranslateWord(filename.fileName,socket,function (err,translatedWord) {
@@ -73,7 +72,7 @@ exports.GetImageByName = function (socket) {
 
     socket.on('getRandomImage', function () {
         var gfs;
-        var conn = mongoose.createConnection(dburl);
+        var conn = mongoose.createConnection(dbGoogleImagesDatabaseUrl);
         conn.once('open', function () {
             gfs = Grid(conn.db);
             var newWord = dc.getRandomPictureWord(function (word) {
