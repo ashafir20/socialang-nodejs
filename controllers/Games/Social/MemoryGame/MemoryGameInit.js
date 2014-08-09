@@ -19,7 +19,7 @@ exports.LaunchMemoryGame = function (gameRoomID, callback) {
                     }
                 });
             }
-            else{
+            else {
                 console.log("Error: could not find game in database".error);
                 callback(false, null);
             }

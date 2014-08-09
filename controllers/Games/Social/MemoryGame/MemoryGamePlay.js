@@ -22,7 +22,37 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 				if(err) throw new Error('no game room found');
 				var jsonResponse = data; //echo back
 				jsonResponse.result = "OK";
+
+				if(jsonResponse.isSecondPress == true) {
+					if(jsonResponse.wasPlayerCorrect){
+						if(game.CurrentPlayerTurn == 1){
+							game.Player1Score = game.Player1Score + 1;
+							if(game.Player1Score == 5) {
+								jsonResponse.IsGameDone = true;
+								socket.emit("MemoryGameWon", null);
+							}
+						} else {
+							game.Player2Score = game.Player2Score + 1;
+							if(game.Player2Score == 5) {
+								jsonResponse.IsGameDone = true;
+								socket.emit("MemoryGameWon", null);
+							}	
+						}
+					}
+				}
+
+				game.CurrentPlayerTurn = CurrentPlayerTurn == 1 : 2 ? 1;
+
+				game.save(function (err, game) {
+					if (err){
+						console.error(err);
+					} else {
+						console.log('game was saved : ' + game);
+					}
+				});
+
 				socket.broadcast.to("MG" + gameRoomID).emit('MemoryGameCardPressOtherPlayerNotify', jsonResponse);
+				
 			});
 		});
 	});

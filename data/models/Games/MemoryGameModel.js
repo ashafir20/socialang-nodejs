@@ -7,7 +7,9 @@ var MemoryGameSchema = mongoose.Schema ({
     Player2 : { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     CurrentPlayerTurn :  { type: Number, default: 1 },
     GameState : {type : String, enum : GameStates },
-    GameRoomID : { type: Number, unique: true }
+    GameRoomID : { type: Number, unique: true },
+    Player1Score : { type: Number, default: 0 },
+    Player2Score : { type: Number, default: 0 },
 });
 
 

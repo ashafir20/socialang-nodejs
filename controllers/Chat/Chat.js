@@ -12,7 +12,7 @@ exports.ChatHandler = function (socket, io) {
 		 	if(err){
 		 		console.log("Error in getting the game room ID - chatting not OK");
 		 	}
-		 	else if(gameRoomID){
+		 	else if(gameRoomID) {
 		 		if(data.GameType == "HeadToHeadQuizGame"){
 			 		console.log("Recives Message: " + data.message);
 			 		console.log("Emitting Message to room: " + RoomPrefixes.HeadToHead + gameRoomID);
