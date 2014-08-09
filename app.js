@@ -21,6 +21,10 @@ var app = express();
 var osipaddress = process.env.OPENSHIFT_NODEJS_IP;
 var osport = process.env.OPENSHIFT_NODEJS_PORT;
 
+
+var app = express();
+var osipaddress = process.env.OPENSHIFT_NODEJS_IP;
+var osport = process.env.OPENSHIFT_NODEJS_PORT;
 app.set('port', osport || 3000);
 app.set('ipaddress', osipaddress);
 
