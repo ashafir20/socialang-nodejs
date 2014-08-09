@@ -27,7 +27,6 @@ exports.LaunchMemoryGame = function (gameRoomID, callback) {
 
 }
 
-
 exports.RemoveGame = function (gameRoomID) {
     MemoryGame.remove({ 'GameRoomID': gameRoomID }, function (error) {
         if(error){
@@ -81,41 +80,3 @@ exports.StartGame = function (player1Id, callback) {
         }
     });
 }
-
-
-
-
-/*exports.RemoveHeadToHeadGame = function (gameRoomID) {
-    HeadToHeadModel.remove({ 'GameRoomID': gameRoomID }, function (error) {
-        if(error){
-            console.log('error removing game from database in hostQuitGameNotification'.error);
-        } else{
-            console.log('an open game was removed from database'.silly);
-        }
-    });
-}
-
-exports.StartHeadToHeadQuizGame = function (player1Id, callback) {
-    Counters.findOneAndUpdate({ name: "headToHeadQuizGame" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) {
-        if(result) {
-            var headToHeadQuizGame = new HeadToHeadModel({
-                GameState : "Waiting",
-                GameRoomID : result.counter,
-                Player1 : player1Id
-            });
-            console.log("Saving new game : " + headToHeadQuizGame);
-            headToHeadQuizGame.save(function (error) {
-                if (error) {
-                    console.log("Error in saving head to head game to database!".error);
-                    console.log(error);
-                    callback(false, null);
-                } else{
-                    console.log("Game Saved!".silly);
-                    callback(true, headToHeadQuizGame);
-                }
-            });
-        }
-    });
-}
-
-*/

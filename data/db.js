@@ -8,7 +8,6 @@ var CountersModel = require('./models/CountersModel');
 
 
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
-var dbGoogleImagesDatabaseUrl = 'mongodb://social:inter4ever@kahana.mongohq.com:10075/SociaLang-GoogleImagesDatabase'
 
 var Grid = require('gridfs-stream');
 var fs = require('fs');

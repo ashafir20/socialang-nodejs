@@ -27,7 +27,7 @@ exports.initialize = function(server) {
         require('../controllers/Games/Social/GamesListController').WaitingGamesListHandler(socket);
         require('../controllers/Chat/Chat').ChatHandler(socket, io);
         require('../controllers/General/connection').disconnectHandler(socket);
-        require('../controllers/ActivityControllers/CommunityController').CommunityHandler(socket);
+        require('../controllers/ActivityControllers/CommunityController').CommunityHandler(socket, io);
         require('../controllers/Games/Solo/HangmanController').HangmanHandler(socket);
         require('../controllers/ActivityControllers/ProfileActivityController').ProfileActivityHandler(socket);
         require('../controllers/General/GridFSManager').GetImageByName(socket);

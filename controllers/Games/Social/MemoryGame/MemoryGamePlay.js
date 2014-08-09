@@ -21,27 +21,27 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 			MemoryGame.findByGameRoomID(gameRoomID, function (error, game) {
 				if(err) throw new Error('no game room found');
 				var jsonResponse = data; //echo back
-				jsonResponse.result = "OK";
 
-				if(jsonResponse.isSecondPress == true) {
-					if(jsonResponse.wasPlayerCorrect){
-						if(game.CurrentPlayerTurn == 1){
-							game.Player1Score = game.Player1Score + 1;
-							if(game.Player1Score == 5) {
-								jsonResponse.IsGameDone = true;
-								socket.emit("MemoryGameWon", null);
-							}
+				jsonResponse.result = "OK";
+				jsonResponse.IsGameDone = false;
+
+				game.CurrentPlayerTurn = game.CurrentPlayerTurn == 1 ? 2 : 1;
+				
+				if(data.IsSecondPress == 'true') 
+				{
+					if(data.wasPlayerCorrect == 'true')
+					{
+						if(game.CurrentPlayerTurn == 1) {
+							game.Player1Score++;
 						} else {
-							game.Player2Score = game.Player2Score + 1;
-							if(game.Player2Score == 5) {
-								jsonResponse.IsGameDone = true;
-								socket.emit("MemoryGameWon", null);
-							}	
+							game.Player2Score++;
+						}
+
+						if(game.Player1Score == 5 || game.Player2Score == 5) {
+							jsonResponse.IsGameDone = true;
 						}
 					}
 				}
-
-				game.CurrentPlayerTurn = CurrentPlayerTurn == 1 : 2 ? 1;
 
 				game.save(function (err, game) {
 					if (err){

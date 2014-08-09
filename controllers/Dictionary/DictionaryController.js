@@ -46,6 +46,10 @@ exports.shuffle = function (o)
 var languageToLocaleDictionary = {};
 languageToLocaleDictionary["Spanish"] = "es";
 languageToLocaleDictionary["Hebrew"] = "he";
+languageToLocaleDictionary["Italian"] = "it";
+languageToLocaleDictionary["French"] = "fr";
+languageToLocaleDictionary["German"] = "de";
+languageToLocaleDictionary["Dutch"] = "nl";
 languageToLocaleDictionary["sp"] = "es";
 languageToLocaleDictionary["he"] = "he";
 

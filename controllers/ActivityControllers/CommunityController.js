@@ -3,7 +3,7 @@ var colors = require('colors');
 var User = mongoose.model('User');
 var Counters = mongoose.model("Counter");
 
-exports.CommunityHandler = function(socket) {
+exports.CommunityHandler = function(socket, io) {
 
     socket.on('friendsRequest', function () {   //Get The Users Friends List
         socket.get('id', function (err, userId) {
@@ -91,6 +91,20 @@ exports.CommunityHandler = function(socket) {
                 acceptFriendRequest(userId, data, socket);
             }
         });
+    });
+
+    //Chat Related
+    socket.on('addUserToCommunityChat', function(data) {
+        socket.join("communitychat");
+    });
+
+    socket.on('removeUserFromCommunityChat', function(data) {
+        socket.leave("communitychat");
+    });
+
+    socket.on('communityChatMessage', function(data) {
+        console.log("Recives Message: " + data.message);
+        io.sockets.in("communitychat").emit("newCommunityChatMessage", data);
     });
 }
 
