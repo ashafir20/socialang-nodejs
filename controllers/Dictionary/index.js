@@ -27,6 +27,6 @@ exports.pictureword = function() {
     return random( picturewords );
 }
 
-exports.pictureword = function() {
+exports.word = function() {
     return random( words );
 }
