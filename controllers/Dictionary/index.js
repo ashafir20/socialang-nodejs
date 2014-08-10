@@ -4,7 +4,7 @@ var words = {
         used: {}
     };
 
-    var picturewords = {
+var picturewords = {
         words: require( './wordsForPictures.js' ),
         used: {}
     };
@@ -23,16 +23,13 @@ function random( list ) {
     return random;
 }
 
-module.exports = {
-    word: function() {
-        return random( words );
-    }
-};
-
 
 module.exports = {
     pictureword: function() {
         return random( picturewords );
+    }
+    word: function() {
+        return random( words );
     }
 };
 
