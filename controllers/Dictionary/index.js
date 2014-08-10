@@ -23,14 +23,10 @@ function random( list ) {
     return random;
 }
 
+exports.pictureword = function() {
+    return random( picturewords );
+}
 
-module.exports = {
-    pictureword: function() {
-        return random( picturewords );
-    }
-    word: function() {
-        return random( words );
-    }
-};
-
-
+exports.pictureword = function() {
+    return random( words );
+}
