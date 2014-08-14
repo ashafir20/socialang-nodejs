@@ -200,24 +200,14 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
     }
 
 
-    socket.on('joinGameRequest', function (req) {
+    socket.on('joinGameRequest', function (req) 
+    {
         console.log('request to join room : ' + req.GameRoomID);
         getVariableFromSocket('id', function(player2Id) {
              if(req.GameType == 'HeadToHeadQuizGame')  {
                   HeadToHeadModel.findByGameRoomID(req.GameRoomID, function (err, headToHeadGame) {
                     if(headToHeadGame) {
                         console.log('FOUND GAME: : '.silly + headToHeadGame);
-                        socket.set('gameRoomID', headToHeadGame.GameRoomID);
-                        var roomid = RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID;
-                        socket.join(roomid);
-                        headToHeadGame.Player2 = player2Id;
-                        headToHeadGame.GameState = "Ready";
-                        headToHeadGame.save(function(errorSavingGame) {
-                            if (!errorSavingGame) {
-                                console.log("Game was saved to database.".silly);
-                            }
-                        });
-
                         User.findById(player2Id, function (errorFindingUser, player2) {
                             if (errorFindingUser) {
                                 console.log("Could not find user by id in database in joinHeadToHeadQuizGameRequest".error);
@@ -228,6 +218,16 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                  var jsonResponse = {};
                                 if(player2.learningLanguage != headToHeadGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: headToHeadGame.Player1, Player2: player2 };
+                                    socket.set('gameRoomID', headToHeadGame.GameRoomID);
+                                    var roomid = RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID;
+                                    socket.join(roomid);
+                                    headToHeadGame.Player2 = player2Id;
+                                    headToHeadGame.GameState = "Ready";
+                                    headToHeadGame.save(function(errorSavingGame) {
+                                        if (!errorSavingGame) {
+                                            console.log("Game was saved to database.".silly);
+                                        }
+                                    });
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
@@ -245,19 +245,6 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                   MemoryGameModel.findByGameRoomID(req.GameRoomID, function (err, memoryGame) {
                     if(memoryGame) {
                         console.log('FOUND GAME: : '.silly + memoryGame);
-                        socket.set('gameRoomID', memoryGame.GameRoomID);
-                        var roomid = RoomPrefixes.MemoryGame + memoryGame.GameRoomID;
-                        socket.join(roomid);
-
-                        memoryGame.Player2 = player2Id;
-                        memoryGame.GameState = "Ready";
-
-                        memoryGame.save(function(errorSavingGame) {
-                            if (!errorSavingGame) {
-                                console.log("memory game was saved to database.".silly);
-                            }
-                        });
-
                         User.findById(player2Id, function (errorFindingUser, player2) {
                             if (errorFindingUser) {
                                 console.log("Could not find user by id in database in joinGameRequest".error);
@@ -268,6 +255,16 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 var jsonResponse = {};
                                 if(player2.learningLanguage != memoryGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: memoryGame.Player1, Player2: player2 };
+                                    socket.set('gameRoomID', memoryGame.GameRoomID);
+                                    var roomid = RoomPrefixes.MemoryGame + memoryGame.GameRoomID;
+                                    socket.join(roomid);
+                                    memoryGame.Player2 = player2Id;
+                                    memoryGame.GameState = "Ready";
+                                    memoryGame.save(function(errorSavingGame) {
+                                        if (!errorSavingGame) {
+                                            console.log("memory game was saved to database.".silly);
+                                        }
+                                    });
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
@@ -285,17 +282,6 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                     StudentTeacherModel.findByGameRoomID(req.GameRoomID, function (err, studentGame) {
                     if(studentGame) {
                         console.log('FOUND GAME: : '.silly + studentGame);
-                        socket.set('gameRoomID', studentGame.GameRoomID);
-                        var roomid = RoomPrefixes.StudentTeacher + studentGame.GameRoomID;
-                        socket.join(roomid);
-                        studentGame.Teacher = player2Id;
-                        studentGame.GameState = "Ready";
-                        studentGame.save(function(errorSavingGame) {
-                            if (!errorSavingGame) {
-                                console.log("Game was saved to database.".silly);
-                            }
-                        });
-
                         User.findById(player2Id, function (errorFindingUser, Teacher) {
                             if (errorFindingUser) {
                                 console.log("Could not find user by id in database in joinStudentGameRequest".error);
@@ -306,6 +292,16 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 var jsonResponse = {};
                                 if(player2.learningLanguage != studentGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: studentGame.Player1, Player2: player2 };
+                                    socket.set('gameRoomID', studentGame.GameRoomID);
+                                    var roomid = RoomPrefixes.StudentTeacher + studentGame.GameRoomID;
+                                    socket.join(roomid);
+                                    studentGame.Teacher = player2Id;
+                                    studentGame.GameState = "Ready";
+                                    studentGame.save(function(errorSavingGame) {
+                                        if (!errorSavingGame) {
+                                            console.log("Game was saved to database.".silly);
+                                        }
+                                    });
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
@@ -323,17 +319,6 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                 StudentTeacherModel.findByGameRoomID(req.GameRoomID, function (err, teacherGame) {
                     if(teacherGame) {
                         console.log('FOUND GAME: : '.silly + teacherGame);
-                        socket.set('gameRoomID', teacherGame.GameRoomID);
-                        var roomid = RoomPrefixes.StudentTeacher + teacherGame.GameRoomID;
-                        socket.join(roomid);
-                        teacherGame.Student = player2Id;
-                        teacherGame.GameState = "Ready";
-                        teacherGame.save(function(errorSavingGame) {
-                            if (!errorSavingGame) {
-                                console.log("Game was saved to database.".silly);
-                            }
-                        });
-
                         User.findById(player2Id, function (errorFindingUser, Student) {
                             if (errorFindingUser) {
                                 console.log("Could not find user by id in database in joinStudentGameRequest".error);
@@ -344,6 +329,17 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 var jsonResponse = {};
                                 if(player2.learningLanguage != teacherGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: teacherGame.Player1, Player2: player2 };
+                                    socket.set('gameRoomID', teacherGame.GameRoomID);
+                                    var roomid = RoomPrefixes.StudentTeacher + teacherGame.GameRoomID;
+                                    socket.join(roomid);
+                                    teacherGame.Student = player2Id;
+                                    teacherGame.GameState = "Ready";
+                                    teacherGame.save(function(errorSavingGame) {
+                                        if (!errorSavingGame) {
+                                            console.log("Game was saved to database.".silly);
+                                        }
+                                    });
+
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
@@ -359,7 +355,5 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
             }
         });
     });
-
-
 
 }
