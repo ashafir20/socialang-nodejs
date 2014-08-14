@@ -15,7 +15,7 @@ var RoomPrefixes = {
 }
 
 var Errors = {
-    DifferentLanguage = "DifferentLanguage"
+    DifferentLanguage : "DifferentLanguage"
 }
 
 exports.GamesRoomRoutesHandler = function (socket, io) {
