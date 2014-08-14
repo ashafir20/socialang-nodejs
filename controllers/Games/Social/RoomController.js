@@ -230,7 +230,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                     jsonResponse = { result: "OK", Player1: headToHeadGame.Player1, Player2: player2 };
                                 }
                                 else{
-                                    jsonResponse = { result: "Failed", Error : Errors.DifferentLanguage };
+                                    jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
                                 }
                                  io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
