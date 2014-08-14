@@ -216,7 +216,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got player2 details from database: " + player2);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID);
                                  var jsonResponse = {};
-                                if(player2.learningLanguage != headToHeadGame.Player1.learningLanguage){
+                                if(player2.learningLanguage == headToHeadGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: headToHeadGame.Player1, Player2: player2 };
                                     socket.set('gameRoomID', headToHeadGame.GameRoomID);
                                     var roomid = RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID;
@@ -228,11 +228,12 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                             console.log("Game was saved to database.".silly);
                                         }
                                     });
+                                     io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
+                                    socket.emit(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                                 }
-                                io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
                             else{
                                  console.log("Player2 was not found in database.".error);
@@ -253,7 +254,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got player2 details from database: " + player2);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.MemoryGame + memoryGame.GameRoomID);
                                 var jsonResponse = {};
-                                if(player2.learningLanguage != memoryGame.Player1.learningLanguage){
+                                if(player2.learningLanguage == memoryGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: memoryGame.Player1, Player2: player2 };
                                     socket.set('gameRoomID', memoryGame.GameRoomID);
                                     var roomid = RoomPrefixes.MemoryGame + memoryGame.GameRoomID;
@@ -265,11 +266,12 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                             console.log("memory game was saved to database.".silly);
                                         }
                                     });
+                                    io.sockets.in(RoomPrefixes.MemoryGame + memoryGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
+                                    socket.emit(RoomPrefixes.MemoryGame + memoryGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                                 }
-                                io.sockets.in(RoomPrefixes.MemoryGame + memoryGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
                             else{
                                  console.log("Player2 was not found in database.".error);
@@ -290,7 +292,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got Teacher details from database: " + Teacher);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.StudentTeacher + studentGame.GameRoomID);
                                 var jsonResponse = {};
-                                if(player2.learningLanguage != studentGame.Player1.learningLanguage){
+                                if(player2.learningLanguage == studentGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: studentGame.Player1, Player2: player2 };
                                     socket.set('gameRoomID', studentGame.GameRoomID);
                                     var roomid = RoomPrefixes.StudentTeacher + studentGame.GameRoomID;
@@ -302,11 +304,12 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                             console.log("Game was saved to database.".silly);
                                         }
                                     });
+                                    io.sockets.in(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse);
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
+                                    socket.emit(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse)
                                 }
-                                io.sockets.in(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse);
                             }
                             else{
                                  console.log("Teacher was not found in database.".error);
@@ -327,7 +330,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got Student details from database: " + Student);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.StudentTeacher + teacherGame.GameRoomID);
                                 var jsonResponse = {};
-                                if(player2.learningLanguage != teacherGame.Player1.learningLanguage){
+                                if(player2.learningLanguage == teacherGame.Player1.learningLanguage){
                                     jsonResponse = { result: "OK", Player1: teacherGame.Player1, Player2: player2 };
                                     socket.set('gameRoomID', teacherGame.GameRoomID);
                                     var roomid = RoomPrefixes.StudentTeacher + teacherGame.GameRoomID;
@@ -339,12 +342,12 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                             console.log("Game was saved to database.".silly);
                                         }
                                     });
-
+                                    io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
-                                }
-                                io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                    socket.emit(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                }  
                             }
                             else{
                                  console.log("Student was not found in database.".error);
