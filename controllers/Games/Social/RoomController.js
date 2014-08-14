@@ -232,7 +232,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
-                                    socket.emit(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                    socket.emit('playerJoinedGameResponse', jsonResponse);
                                 }
                             }
                             else{
@@ -270,7 +270,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
-                                    socket.emit(RoomPrefixes.MemoryGame + memoryGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                    socket.emit('playerJoinedGameResponse', jsonResponse);
                                 }
                             }
                             else{
@@ -308,7 +308,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
-                                    socket.emit(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse)
+                                    socket.emit('teacherJoinedStudentGameResponse', jsonResponse)
                                 }
                             }
                             else{
@@ -346,7 +346,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 }
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
-                                    socket.emit(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                    socket.emit('playerJoinedGameResponse', jsonResponse);
                                 }  
                             }
                             else{
