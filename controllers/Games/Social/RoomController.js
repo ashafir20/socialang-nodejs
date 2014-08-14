@@ -14,6 +14,10 @@ var RoomPrefixes = {
     MemoryGame : "MG"
 }
 
+var Errors = {
+    DifferentLanguage = "DifferentLanguage"
+}
+
 exports.GamesRoomRoutesHandler = function (socket, io) {
     socket.on('gameLaunchRequest', function (req) {
         var jsonResponse;
@@ -221,8 +225,14 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                             else if (player2) {
                                 console.log("Got player2 details from database: " + player2);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID);
-                                var jsonResponse = { result: "OK", Player1: headToHeadGame.Player1, Player2: player2 };
-                                io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                 var jsonResponse = {};
+                                if(player2.learningLanguage != headToHeadGame.Player1.learningLanguage){
+                                    jsonResponse = { result: "OK", Player1: headToHeadGame.Player1, Player2: player2 };
+                                }
+                                else{
+                                    jsonResponse = { result: "Failed", Error : Errors.DifferentLanguage };
+                                }
+                                 io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
                             else{
                                  console.log("Player2 was not found in database.".error);
