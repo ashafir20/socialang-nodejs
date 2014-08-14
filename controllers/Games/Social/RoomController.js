@@ -232,7 +232,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
                                 }
-                                 io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+                                io.sockets.in(RoomPrefixes.HeadToHead + headToHeadGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
                             else{
                                  console.log("Player2 was not found in database.".error);
@@ -265,7 +265,13 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                             else if (player2) {
                                 console.log("Got player2 details from database: " + player2);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.MemoryGame + memoryGame.GameRoomID);
-                                var jsonResponse = { result: "OK", Player1: memoryGame.Player1, Player2: player2 };
+                                var jsonResponse = {};
+                                if(player2.learningLanguage != memoryGame.Player1.learningLanguage){
+                                    jsonResponse = { result: "OK", Player1: memoryGame.Player1, Player2: player2 };
+                                }
+                                else{
+                                    jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
+                                }
                                 io.sockets.in(RoomPrefixes.MemoryGame + memoryGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
                             else{
@@ -297,7 +303,13 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                             else if (Teacher) {
                                 console.log("Got Teacher details from database: " + Teacher);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.StudentTeacher + studentGame.GameRoomID);
-                                var jsonResponse = { result: "OK", Player1: studentGame.Student, Player2: Teacher };
+                                var jsonResponse = {};
+                                if(player2.learningLanguage != studentGame.Player1.learningLanguage){
+                                    jsonResponse = { result: "OK", Player1: studentGame.Player1, Player2: player2 };
+                                }
+                                else{
+                                    jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
+                                }
                                 io.sockets.in(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse);
                             }
                             else{
@@ -329,8 +341,14 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                             else if (Student) {
                                 console.log("Got Student details from database: " + Student);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.StudentTeacher + teacherGame.GameRoomID);
-                                var jsonResponse = { result: "OK", Player2: Student, Player1: teacherGame.Teacher };
-                                io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('studentJoinedTeacherGameResponse', jsonResponse);
+                                var jsonResponse = {};
+                                if(player2.learningLanguage != teacherGame.Player1.learningLanguage){
+                                    jsonResponse = { result: "OK", Player1: teacherGame.Player1, Player2: player2 };
+                                }
+                                else{
+                                    jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
+                                }
+                                io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
                             }
                             else{
                                  console.log("Student was not found in database.".error);
