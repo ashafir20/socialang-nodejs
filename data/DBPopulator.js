@@ -18,7 +18,7 @@ conn.once('open', function () {
 });
 
 function UpdateGridFS(gfs) {
-  fs.readdir('data/images/upload', function (err, files) {
+  fs.readdir('images/upload', function (err, files) {
     if(err) {
       console.log(err);
       throw new Error('error reading files from directory');
@@ -40,7 +40,7 @@ function putFile (gfs, file) {
            mode: 'w' // write in truncate mode. Existing data will be overwriten.
       });
 
-      fs.createReadStream("data/images/upload/" + file).pipe(writestream);
+      fs.createReadStream("images/upload/" + file).pipe(writestream);
 
       writestream.on('close', function (file) {
           console.log('finished uploading file : ' + file.filename);
