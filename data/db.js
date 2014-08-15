@@ -6,8 +6,12 @@ var MemoryGameModel = require('./models/Games/MemoryGameModel');
 var QuizGameModel = require('./models/Games/QuizGameModel');
 var CountersModel = require('./models/CountersModel');
 var DBPopulator = require('./DBPopulator');
+var GameCleaner = require('../controllers/Games/Social/GameCleaner');
 
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
+mongoose.connect(dburl);
+
+GameCleaner.CleanAbandonedGamesHandler();
 
 mongoose.connection.on('connected', function () {
     console.log('Mongoose connected to ' + dburl);

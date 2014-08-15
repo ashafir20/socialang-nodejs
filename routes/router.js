@@ -32,6 +32,7 @@ exports.initialize = function(server) {
         require('../controllers/ActivityControllers/ProfileActivityController').ProfileActivityHandler(socket);
         require('../controllers/General/GridFSManager').GetImageByName(socket);
 
+        require('../controllers/PointsController').HandlePoints(socket);
         //require('../controllers/Games/Solo/PhotoGuessController').PhotoGuessHandler(socket);
 
     });

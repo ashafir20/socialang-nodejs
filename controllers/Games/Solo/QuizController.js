@@ -4,7 +4,7 @@ var HeadToHeadModel = mongoose.model("HeadToHead");
 var User = mongoose.model('User');
 var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
 var colors = require('colors');
-
+var dict = require('../../../controllers/Dictionary/DictionaryController');
 
 exports.startQuizGame = function (socket){
     socket.on('startNewQuizGame', function()  {
@@ -91,7 +91,10 @@ exports.startQuizGame = function (socket){
                         console.log("Successful to get QuizGame form databse : ".silly);
                         QuizGameModel.getQuestion(function(wordsArray) {
                             console.log("WORD ARRAY WE GOT  : ".silly + wordsArray);
-                            googleTranslate.translate(wordsArray[0], 'es', function(err, translation) {
+
+                            var localeLanguage = dict.GetLanguageLocale(game.Language);
+
+                            googleTranslate.translate(wordsArray[0], localeLanguage , function(err, translation) {
                                 if (err) {
                                     console.log("error in translate : ".silly + err);
                                     jsonResponse = { result : 'Failed' };

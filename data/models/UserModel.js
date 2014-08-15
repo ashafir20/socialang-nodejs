@@ -29,6 +29,24 @@ var UserSchema = mongoose.Schema({
     }]
 });
 
+UserSchema.statics.UpdatePoints = function(userId, points) {
+    this.findById(userId, function (err, user) {
+        if(user) {
+           for (var i = 0; i < stats.length; i++) {
+               if(stats[i].language == user.learningLanguage) {
+                    stats[i].points += points;
+                    user.save(function (err) {
+                        if(!err) {
+                            console.log('updated user points and saved!');
+                        }
+                    });
+                 break;
+               }
+            }
+        }
+    });
+}
+
 UserSchema.statics.GetFriends = function(userId, callback) {
     this.findById(userId)
         .populate('friends')

@@ -7,14 +7,11 @@ var dburl = 'mongodb://social:inter4ever@kahana.mongohq.com:10025/SociaLang-Loca
 
 Grid.mongo = mongoose.mongo;
 
-mongoose.connect(dburl);
-
 var conn = mongoose.createConnection(dburl);
 conn.once('open', function () {
   //uncomment this if you want to store new files in gridfs
-  var gfs = Grid(conn.db);
-  UpdateGridFS(gfs);
-
+  //var gfs = Grid(conn.db);
+  //UpdateGridFS(gfs);
 });
 
 function UpdateGridFS(gfs) {

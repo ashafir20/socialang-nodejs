@@ -10,6 +10,8 @@ var MemoryGameSchema = mongoose.Schema ({
     GameRoomID : { type: Number, unique: true },
     Player1Score : { type: Number, default: 0 },
     Player2Score : { type: Number, default: 0 },
+    LastPlay : { type : Date },
+    TimeCreated : { type : Date, default: new Date() }
 });
 
 

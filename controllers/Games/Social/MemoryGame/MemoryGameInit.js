@@ -62,7 +62,8 @@ exports.StartGame = function (player1Id, callback) {
             var memoryGame = new MemoryGame({
                 GameState : "Waiting",
                 GameRoomID : result.counter,
-                Player1 : player1Id
+                Player1 : player1Id,
+                TimeCreatd : new Date()
             });
 
             console.log("Saving new game : " + memoryGame);

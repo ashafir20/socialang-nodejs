@@ -21,6 +21,10 @@ exports.ChatHandler = function (socket, io) {
 			 		console.log("Recives Message: " + data.message);
 			 		console.log("Emitting Message to room: " + RoomPrefixes.MemoryGame + gameRoomID);
 					io.sockets.in(RoomPrefixes.MemoryGame + gameRoomID).emit("chatMessageResponse", data);
+		 		} else if(data.GameType == "StudentGame" || data.GameType == "TeacherGame"){
+			 		console.log("Recives Message: " + data.message);
+			 		console.log("Emitting Message to room: " + RoomPrefixes.StudentTeacher + gameRoomID);
+					io.sockets.in(RoomPrefixes.StudentTeacher + gameRoomID).emit("chatMessageResponse", data);
 		 		}
 			}
 			else{

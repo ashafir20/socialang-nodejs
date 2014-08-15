@@ -26,6 +26,7 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 				jsonResponse.IsGameDone = false;
 
 				game.CurrentPlayerTurn = game.CurrentPlayerTurn == 1 ? 2 : 1;
+				game.LastPlay = new Date();
 				
 				if(data.IsSecondPress == 'true') 
 				{

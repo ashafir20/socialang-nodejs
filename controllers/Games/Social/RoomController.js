@@ -254,13 +254,16 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got player2 details from database: " + player2);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.MemoryGame + memoryGame.GameRoomID);
                                 var jsonResponse = {};
-                                if(player2.learningLanguage == memoryGame.Player1.learningLanguage){
+                                if(player2.learningLanguage == memoryGame.Player1.learningLanguage)
+                                {
                                     jsonResponse = { result: "OK", Player1: memoryGame.Player1, Player2: player2 };
                                     socket.set('gameRoomID', memoryGame.GameRoomID);
                                     var roomid = RoomPrefixes.MemoryGame + memoryGame.GameRoomID;
                                     socket.join(roomid);
+
                                     memoryGame.Player2 = player2Id;
                                     memoryGame.GameState = "Ready";
+
                                     memoryGame.save(function(errorSavingGame) {
                                         if (!errorSavingGame) {
                                             console.log("memory game was saved to database.".silly);
@@ -292,21 +295,26 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got Teacher details from database: " + Teacher);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.StudentTeacher + studentGame.GameRoomID);
                                 var jsonResponse = {};
-                                if(player2.learningLanguage == studentGame.Player1.learningLanguage){
-                                    jsonResponse = { result: "OK", Player1: studentGame.Player1, Player2: player2 };
+                                if(Teacher.learningLanguage == studentGame.Student.learningLanguage)
+                                {
+
+                                    jsonResponse = { result: "OK", Player1: studentGame.Student, Player2: Teacher };
                                     socket.set('gameRoomID', studentGame.GameRoomID);
                                     var roomid = RoomPrefixes.StudentTeacher + studentGame.GameRoomID;
                                     socket.join(roomid);
                                     studentGame.Teacher = player2Id;
                                     studentGame.GameState = "Ready";
+
                                     studentGame.save(function(errorSavingGame) {
                                         if (!errorSavingGame) {
                                             console.log("Game was saved to database.".silly);
                                         }
                                     });
+
                                     io.sockets.in(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse);
                                 }
-                                else{
+                                else
+                                {
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
                                     socket.emit('teacherJoinedStudentGameResponse', jsonResponse)
                                 }
@@ -330,23 +338,27 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                 console.log("Got Student details from database: " + Student);
                                 console.log("emitting to clients on room : ".silly + RoomPrefixes.StudentTeacher + teacherGame.GameRoomID);
                                 var jsonResponse = {};
-                                if(player2.learningLanguage == teacherGame.Player1.learningLanguage){
-                                    jsonResponse = { result: "OK", Player1: teacherGame.Player1, Player2: player2 };
+                                if(Student.learningLanguage == teacherGame.Teacher.learningLanguage)
+                                {
+                                    jsonResponse = { result: "OK", Player1: teacherGame.Teacher, Player2: Student };
                                     socket.set('gameRoomID', teacherGame.GameRoomID);
                                     var roomid = RoomPrefixes.StudentTeacher + teacherGame.GameRoomID;
                                     socket.join(roomid);
                                     teacherGame.Student = player2Id;
                                     teacherGame.GameState = "Ready";
+
                                     teacherGame.save(function(errorSavingGame) {
                                         if (!errorSavingGame) {
                                             console.log("Game was saved to database.".silly);
                                         }
                                     });
-                                    io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('playerJoinedGameResponse', jsonResponse);
+
+                                    io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('studentJoinedTeacherGameResponse', jsonResponse);
                                 }
-                                else{
+                                else
+                                {
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
-                                    socket.emit('playerJoinedGameResponse', jsonResponse);
+                                    socket.emit('studentJoinedTeacherGameResponse', jsonResponse);
                                 }  
                             }
                             else{

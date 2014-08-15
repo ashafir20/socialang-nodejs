@@ -21,7 +21,8 @@
     "http-proxy": "^1.1.6",
     "socket.io-proxy": "^1.0.3",
     "util": "^0.10.3",
-    "google-images": "^0.1.0"
+    "google-images": "^0.1.0",
+    "moment": "^2.8.1"
   },
   "subdomain": "lang.social.com",
   "scripts": {
