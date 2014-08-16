@@ -1,9 +1,8 @@
 var io = require('socket.io');
-var mongoose = require('mongoose');
-var HeadToHeadModel = mongoose.model("HeadToHead");
-
 
 exports.initialize = function(server) {
+
+    require('../controllers/Games/GameCleaner').CleanGames();
 
     io = io.listen(server);
 
@@ -19,6 +18,9 @@ exports.initialize = function(server) {
         require('../controllers/ActivityControllers/RegisterActivityController').Signup(socket);
         require('../controllers/ActivityControllers/LoginFacebook').LoginFacebook(socket);
         require('../controllers/ActivityControllers/MainActivityController').HomeActivityHandler(socket);
+
+        require('../controllers/ActivityControllers/TranslatorController').HandleTranslations(socket);
+
         require('../controllers/Games/Solo/QuizController').startQuizGame(socket);
         require('../controllers/Games/Social/RoomController').GamesRoomRoutesHandler(socket, io);
         require('../controllers/Games/Social/HeadToHead/HeadToHeadQuizPlay').HeadToHeadQuizGameRoutesHandler(socket, io);
@@ -32,7 +34,9 @@ exports.initialize = function(server) {
         require('../controllers/ActivityControllers/ProfileActivityController').ProfileActivityHandler(socket);
         require('../controllers/General/GridFSManager').GetImageByName(socket);
 
-        require('../controllers/PointsController').HandlePoints(socket);
+        require('../controllers/Games/PointsController').HandlePoints(socket);
+
+        require('../controllers/General/TTS').HandleTTSRequests(socket);
         //require('../controllers/Games/Solo/PhotoGuessController').PhotoGuessHandler(socket);
 
     });

@@ -1,10 +1,12 @@
 var mongoose = require('mongoose');
 var HeadToHeadModel = mongoose.model("HeadToHead");
 var MemoryGameModel = mongoose.model("MemoryGame");
+var QuizGameModel = mongoose.model("QuizGameModel");
+var StudentTeacherModel = mongoose.model("StudentTeacher");
 var moment = require('moment');
 
-exports.CleanAbandonedGamesHandler = function () {
-    var interval = setInterval(function () {
+exports.CleanGames = function () {
+/*    var interval = setInterval(function () {
         console.log('inside CleanAbandonedGamesHandler interval');
 
         var diff = new Date(moment().subtract('minutes', 1).toDate().toISOString());
@@ -14,7 +16,13 @@ exports.CleanAbandonedGamesHandler = function () {
         MemoryGameModel.find({})
             .where('TimeCreated').lt(diff)
             .exec(RemoveGames);
-        }, 30000 /* Interval is 30 seconds */);
+        }, 30000 /* Interval is 30 seconds );*/
+
+    //on server restart remove all playing games...
+    MemoryGameModel.find({}).exec(RemoveGames);
+    HeadToHeadModel.find({}).exec(RemoveGames);
+    StudentTeacherModel.find({}).exec(RemoveGames);
+    QuizGameModel.find({}).exec(RemoveGames);
 }
 
 function RemoveGames(gamesToRemove){

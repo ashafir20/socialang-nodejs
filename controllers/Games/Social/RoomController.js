@@ -310,7 +310,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
                                             console.log("Game was saved to database.".silly);
                                         }
                                     });
-
+                                    
                                     io.sockets.in(RoomPrefixes.StudentTeacher + studentGame.GameRoomID).emit('teacherJoinedStudentGameResponse', jsonResponse);
                                 }
                                 else
@@ -355,8 +355,7 @@ exports.GamesRoomRoutesHandler = function (socket, io) {
 
                                     io.sockets.in(RoomPrefixes.StudentTeacher + teacherGame.GameRoomID).emit('studentJoinedTeacherGameResponse', jsonResponse);
                                 }
-                                else
-                                {
+                                else{
                                     jsonResponse = { result: "Failed", error : Errors.DifferentLanguage };
                                     socket.emit('studentJoinedTeacherGameResponse', jsonResponse);
                                 }  
