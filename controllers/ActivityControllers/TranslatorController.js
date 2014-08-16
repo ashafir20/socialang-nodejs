@@ -13,11 +13,15 @@ languagesToLocalMap.put("Dutch", "nl");*/
 exports.HandleTranslations = function (socket) {
 	socket.on('translateRequest', function (data) {
 		console.log(data);
+
 		var wordToTranslate = data.word;
+		//var userCurrentLocale = data.language;
+
 		var results = [];
 		for (var i = 0; i < languagesLocales.length; i++) {
 			console.log('trying to translate word : ' + wordToTranslate + ' in locale : ' + languagesLocales[i]);
-			var locale = languagesLocales[i];
+			var locale = languagesLocales[i]; //target language (language to translate to)
+			//source language not specified google will automatically detect it from text
 			translateWord(wordToTranslate, locale, function (locale, translatedText) {
 				console.log('translate text in locale : ' + locale);
 				console.log('translate text : ' + translatedText);
