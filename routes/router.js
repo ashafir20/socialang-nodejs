@@ -39,6 +39,8 @@ exports.initialize = function(server) {
         require('../controllers/General/TTS').HandleTTSRequests(socket);
         //require('../controllers/Games/Solo/PhotoGuessController').PhotoGuessHandler(socket);
 
+        require('../controllers/General/ClientImagesPopulator').HandleClientImageCachingRequests(socket);
+
     });
 
 };

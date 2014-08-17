@@ -3,7 +3,7 @@ var HeadToHeadModel = mongoose.model("HeadToHead");
 var MemoryGameModel = mongoose.model("MemoryGame");
 var QuizGameModel = mongoose.model("QuizGameModel");
 var StudentTeacherModel = mongoose.model("StudentTeacher");
-var moment = require('moment');
+//var moment = require('moment');
 
 exports.CleanGames = function () {
 /*    var interval = setInterval(function () {
