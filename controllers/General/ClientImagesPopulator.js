@@ -41,15 +41,20 @@ exports.HandleClientImageCachingRequests = function (socket) {
     socket.on('MGImagesRequest', function (data) {
     	console.log('in MGImagesRequest'.green);
     	//calling from client room activity
-    	getVariableFromSocket(socket, 'gameRoomID', function (gameRoomID) {
-    		if(gameRoomID) {
+    	getVariableFromSocket(socket, 'gameRoomID', function (gameRoomID) 
+    	{
+    		if(gameRoomID) 
+    		{
     			MemoryGameModel.findByGameRoomID(gameRoomID, function (err, game) {
     				if(!err) console.log('game was found'.green);
-    				if(typeof game.ImagesFilenames !== 'undefined' &&  game.ImagesFilenames > 0){
-    					console.log('images array in game ISNT empty'.green);
+    				if(data.isHost)
+    				{
+    					console.log('user is host'.green);
     					randomizeAndSendToHost(socket, game);
-    				} else{
-    					console.log('images array in game IS empty'.green);
+    				}
+    				else
+    				{
+    					console.log('user is guest'.green);
     					sendToGuestExistingImages(socket);
     				}
     			});
