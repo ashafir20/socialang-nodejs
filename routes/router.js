@@ -2,8 +2,6 @@ var io = require('socket.io');
 
 exports.initialize = function(server) {
 
-    require('../controllers/Games/GameCleaner').CleanGames();
-
     io = io.listen(server);
 
     io.sockets.on('connection', function (socket) {

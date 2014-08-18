@@ -3,7 +3,6 @@ var Grid = require('gridfs-stream');
 var fs = require('fs');
 var path = require('path');
 
-//var dburl = 'mongodb://social:inter4ever@kahana.mongohq.com:10025/SociaLang-LocalStorage';
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
 var imagesLocalFolderPath = "Images/Upload/Animals/"
 
@@ -13,7 +12,7 @@ var conn = mongoose.createConnection(dburl);
 conn.once('open', function () {
   //uncomment this if you want to store new files in gridfs
   var gfs = Grid(conn.db);
-  UpdateGridFS(gfs);
+  //UpdateGridFS(gfs);
 });
 
 function UpdateGridFS(gfs) {
