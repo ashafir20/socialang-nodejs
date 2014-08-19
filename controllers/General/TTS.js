@@ -5,8 +5,8 @@ var streamBuffers = require("stream-buffers");
 exports.HandleTTSRequests = function (socket) {
     socket.on('TTS', function (data) {
     	console.log(data);
-    	TTS(data.language, data.word, function (data) {
-    		var jsonResponse = { result : "OK" , tts : data };
+    	TTS(data.language, data.word, function (data, locale, word) {
+    		var jsonResponse = { result : "OK" , tts : data, word : word };
     		socket.emit("TTSResponse", jsonResponse);
     	});
     });
