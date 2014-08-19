@@ -41,21 +41,30 @@ exports.HandleClientImageCachingRequests = function (socket) {
     socket.on('MGImagesRequest', function (data) {
     	console.log('in MGImagesRequest'.green);
     	//calling from client room activity
-    	getVariableFromSocket(socket, 'gameRoomID', function (gameRoomID) 
-    	{
-    		if(gameRoomID) 
-    		{
+    	getVariableFromSocket(socket, 'gameRoomID', function (gameRoomID) {
+    		if(gameRoomID) {
     			MemoryGameModel.findByGameRoomID(gameRoomID, function (err, game) {
-    				if(!err) console.log('game was found'.green);
-    				if(data.isHost)
-    				{
+                    if(err) throw new Error('game was not found!');
+    				else if(!err) console.log('game was found'.green);
+    				if(data.isHost == 'true') {
     					console.log('user is host'.green);
-    					randomizeAndSendToHost(socket, game);
-    				}
-    				else
-    				{
+    					GetRandomizedImages(game, function (results) {
+                            SaveImagesToGameDocument(results, game);
+                            var jsonResult = { result : "OK", images : results };
+                            socket.emit('MGImagesResponse', jsonResult);
+                            //clear images from document
+                        });
+    				} else {
     					console.log('user is guest'.green);
-    					sendToGuestExistingImages(socket);
+    					GetExistingImages(game, function (results) {
+                            if(results != null){
+                                var jsonResult = { result : "OK", images : results };
+                                socket.emit('MGImagesResponse', jsonResult);
+                            } else {
+                                var jsonResult = { result : "Failed", "Message" : 'TryAgain' };
+                                socket.emit('MGImagesResponse', jsonResult);
+                            }
+                        });
     				}
     			});
     		}
@@ -63,33 +72,68 @@ exports.HandleClientImageCachingRequests = function (socket) {
     });
 }
 
-function sendToGuestExistingImages(socket) {
+function GetExistingImages(game, callback) {
 	console.log('in sendToGuestExistingImages'.green);
+    var conn = mongoose.createConnection(dburl);
+    conn.once('open', function () {
+        var gfs = Grid(conn.db);
+        //stream from gridfs the game.ImagesFilenames
+        var results = [];
+        if(typeof game.ImagesFilenames !== 'undefined' && game.ImagesFilenames.length > 0)
+        {
+            console.log('in GetExistingImages and images are in document'.green);
+            console.log('images array doc length: ' + game.ImagesFilenames.length);
+            for (var i = 0; i < game.ImagesFilenames.length ; i++) 
+            {
+                console.log('getting file : ' + game.ImagesFilenames[i].filename);
+                var filename = game.ImagesFilenames[i].filename;
+                var pairid = game.ImagesFilenames[i].pairId;
+                GetImageFromGridFS(gfs, filename, pairid ,function  (filename, pairid, data) {
+                    results.push({ 'filename' : filename, 'pairId' : pairid, 'data': data }); 
+                    if(results.length == game.ImagesFilenames.length) {
+                        callback(results);
+                    }
+                }); 
+            }
+        }  
+        else 
+        {
+            console.log('in GetExistingImages and no images in document'.error);
+            callback(null);
+        }
+    });
 }
 
 
-function randomizeAndSendToHost(socket, game) {
+
+function GetRandomizedImages(game, callback) {
 	console.log('in randomizeAndSendToHost'.green);
 	var conn = mongoose.createConnection(dburl);
 	conn.once('open', function () {
 	  var gfs = Grid(conn.db);
 	  GetAllImageFileNamesInDatabase(gfs, function (filenames) {
 			GetRandomImageFiles(gfs, filenames, function  (results) {
-				var jsonResult = { result : "OK", images : results };
-				saveImageToGameDocument(results, game);
-				//socket.emit('MGImagesResponse', jsonResult);
+                callback(results);
 			});
 		});
 	});
 }
 
-function saveImageToGameDocument(results, game) {
+function SaveImagesToGameDocument(results, game) {
+    console.log('in SaveImagesToGameDocument'.silly);
 	for (var i = 0; i < results.length; i++) {
-		game.ImagesFilenames.push(results[i].filename);
+        console.log('pushed ' + results[i].filename + " to document images array".green);
+		game.ImagesFilenames.push({ 'filename' : results[i].filename, 'pairId' : results[i].pairId });
 	};
 
-	game.save(function (err) {
-		if(!err) console.log('images were saved to game document!'.silly);
+	game.save(function (err, game) {
+		if(!err) {
+            console.log('images were saved to game document!'.silly);
+            console.log(game);
+        }
+        else {
+            console.log('game could not be saved after inserting images'.error);
+        }
 	})
 }
 
@@ -97,22 +141,31 @@ function saveImageToGameDocument(results, game) {
 
 function GetRandomImageFiles(gfs, filenames, callback) {
 	var results = [];
-	for (var i = 0; i < 8 ; i++) {
-		var randDoc;
-		do {
-			randDoc = filenames[Math.floor(Math.random() * filenames.length)];
-		} while(results.contains(randDoc));
+    var alreadyTakenFilenames = [];
+	for (var pairid = 1; pairid <= 8 ; pairid++) 
+    {
+        var randDoc = getRandomImageFromArray(filenames, alreadyTakenFilenames);
 		console.log('random file choosen is: ' + randDoc.filename);
-		GetImageFromGridFS(gfs, randDoc.filename ,function  (filename, data) {
-			results.push({ 'filename' : filename, 'data': data });
+		GetImageFromGridFS(gfs, randDoc.filename, pairid ,function  (filename, pairId, data) {
+			results.push({ 'filename' : filename, 'data': data , 'pairId' : pairId });
 			if(results.length == 8) {
 				callback(results);
 			}
 		});
-	};
+	}
 }
 
-function GetImageFromGridFS(gfs, file, callback){
+function getRandomImageFromArray(allGridfsFilesnames, alreadyTakenFilenames) {
+    var randDoc;
+    do {
+        randDoc = allGridfsFilesnames[Math.floor(Math.random() * allGridfsFilesnames.length)];
+    } while(alreadyTakenFilenames.contains(randDoc.filename));
+
+    alreadyTakenFilenames.push(randDoc.filename);
+    return randDoc;
+}
+
+function GetImageFromGridFS(gfs, file, pairid, callback){
 	console.log('trying to get : ' + file + ' from grid');
 	// streaming from gridfs
 	var readstream = gfs.createReadStream({
@@ -128,7 +181,7 @@ function GetImageFromGridFS(gfs, file, callback){
         console.log('File transfer completed! file : ' + file);
         var fb = Buffer.concat(buf);
         var base64data = fb.toString('base64');
-        callback(file, base64data);
+        callback(file, pairid ,base64data);
     });
 
 	//error handling, e.g. file does not exist

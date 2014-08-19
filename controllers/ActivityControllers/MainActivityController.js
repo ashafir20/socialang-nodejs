@@ -1,13 +1,39 @@
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
-
+var MemoryGameModel = mongoose.model("MemoryGame");
+var HeadToHeadModel = mongoose.model("HeadToHead");
 var Levels = require('../../Levels.js').Levels;
 var LevelPointsMap = require('../../Levels.js').LevelPointsMap;
 
 exports.HomeActivityHandler = function(socket) {
+
+    socket.on('userInHomeActivity', function() {
+        console.log('in userInHomeActivity');
+         socket.get('id', function (err, id) {
+            if(id) {
+                MemoryGameModel.findOne({ 'Player1' : id }, function (err, game) {
+                    if(game){
+                        game.remove(function (err) {
+                           if(!err) console.log('memory game removed');
+                        });
+                    }
+                });
+                HeadToHeadModel.findOne({ 'Player1' : id }, function (err, game) {
+                    if(game){
+                        game.remove(function (err) {
+                           if(!err) console.log('head to head game removed');
+                        });
+                    }
+                });
+            }
+         });
+     });
+
+
+
     socket.on('languageLearnUpdate', function(userLanguage) {
         var jsonResponse;
-        socket.get('id', function(err, id) {
+        socket.get('id', function (err, id) {
             if(err)
             {
                 console.log("Error: could not get user id from socket");

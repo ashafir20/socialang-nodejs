@@ -48,7 +48,7 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 					if (err){
 						console.error(err);
 					} else {
-						console.log('game was saved : ' + game);
+						console.log('game was saved!');
 					}
 				});
 
