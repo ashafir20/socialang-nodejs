@@ -11,7 +11,8 @@ var MemoryGameSchema = mongoose.Schema ({
     Player1Score : { type: Number, default: 0 },
     Player2Score : { type: Number, default: 0 },
     LastPlay : { type : Date },
-    TimeCreated : { type : Date, default: new Date() }
+    TimeCreated : { type : Date, default: new Date() },
+    ImagesFilenames : [String]
 });
 
 

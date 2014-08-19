@@ -2,8 +2,6 @@ var io = require('socket.io');
 
 exports.initialize = function(server) {
 
-    require('../controllers/Games/GameCleaner').CleanGames();
-
     io = io.listen(server);
 
     io.sockets.on('connection', function (socket) {
@@ -38,6 +36,8 @@ exports.initialize = function(server) {
 
         require('../controllers/General/TTS').HandleTTSRequests(socket);
         //require('../controllers/Games/Solo/PhotoGuessController').PhotoGuessHandler(socket);
+
+        require('../controllers/General/ClientImagesPopulator').HandleClientImageCachingRequests(socket);
 
     });
 
