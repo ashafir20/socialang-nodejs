@@ -17,7 +17,7 @@ var UserSchema = mongoose.Schema({
     friendsRequests : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     stats       : [{
         language: String,
-        points: Number,
+        points: { type: Number, default: 0 },
         level: { type: String, enum: Levels }
      }],
     messages    : [{

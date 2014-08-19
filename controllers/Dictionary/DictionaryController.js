@@ -50,6 +50,8 @@ languageToLocaleDictionary["Italian"] = "it";
 languageToLocaleDictionary["French"] = "fr";
 languageToLocaleDictionary["German"] = "de";
 languageToLocaleDictionary["Dutch"] = "nl";
+languageToLocaleDictionary["Greek"] = "el";
+languageToLocaleDictionary["Russian"] = "ru";
 
 exports.GetLanguageLocale = function (language) {
     return languageToLocaleDictionary[language];

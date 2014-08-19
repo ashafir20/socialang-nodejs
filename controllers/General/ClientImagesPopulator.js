@@ -3,6 +3,8 @@ var Grid = require('gridfs-stream');
 var MemoryGameModel = mongoose.model("MemoryGame");
 var colors = require('colors');
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
+var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
+var Dictionary = require("../Dictionary/DictionaryController");
 
 Grid.mongo = mongoose.mongo;
 
@@ -50,19 +52,24 @@ exports.HandleClientImageCachingRequests = function (socket) {
     					console.log('user is host'.green);
     					GetRandomizedImages(game, function (results) {
                             SaveImagesToGameDocument(results, game);
-                            var jsonResult = { result : "OK", images : results };
-                            socket.emit('MGImagesResponse', jsonResult);
+                            convertWordsToLearningLanguage(game.Player1.learningLanguage, results, function (results) {
+                                var jsonResult = { result : "OK", images : results };
+                                socket.emit('MGImagesResponse', jsonResult);
+                            });
                             //clear images from document
                         });
     				} else {
     					console.log('user is guest'.green);
-    					GetExistingImages(game, function (results) {
+    					GetImages(game, function (results) {
                             if(results != null){
-                                var jsonResult = { result : "OK", images : results };
-                                socket.emit('MGImagesResponse', jsonResult);
+                                var learningLanguage = game.Player1.learningLanguage;
+                                convertWordsToLearningLanguage(learningLanguage, results, function (results) {
+                                    var jsonResult = { result : "OK", images : results };
+                                    socket.emit('MGImagesResponse', jsonResult);
+                                });
                             } else {
-                                var jsonResult = { result : "Failed", "Message" : 'TryAgain' };
-                                socket.emit('MGImagesResponse', jsonResult);
+                               var jsonResult = { result : "Failed", "Message" : 'TryAgain' };
+                               socket.emit('MGImagesResponse', jsonResult);
                             }
                         });
     				}
@@ -72,7 +79,50 @@ exports.HandleClientImageCachingRequests = function (socket) {
     });
 }
 
-function GetExistingImages(game, callback) {
+
+function convertWordsToLearningLanguage(learningLanguage, results, callback) {
+    var translatedResults = [];
+    if(results == null) console.log('error in convertWordsToLearningLanguage! results is null'.error);
+    for (var i = 0; i < results.length; i++) {
+        var indexOfDot = results[i].filename.indexOf('.');
+        var imagename = results[i].filename.substring(0, indexOfDot);
+        var locale = Dictionary.GetLanguageLocale(learningLanguage); //target language (language to translate to)
+        insertTranslatedResult(imagename, locale, translatedResults, results[i], function (newResult) {
+            translatedResults.push(newResult);
+            if(translatedResults.length == results.length){
+                console.log('inserted oldresult to a new translated array!'.silly);
+                callback(translatedResults);
+            }
+        });
+    };
+
+}
+
+function insertTranslatedResult(imagename, locale, translatedResults, oldresult, callback){
+    translateWord(imagename, locale, function (locale, translatedText) {
+        var newResult = {};
+        newResult.filename = translatedText;
+        newResult.pairid = oldresult.pairId;
+        newResult.data = oldresult.data;
+        console.log('translated result:' + newResult);
+        callback(newResult);
+    });
+}
+
+function translateWord(wordToTranslate, locale, callback) {
+    googleTranslate.translate(wordToTranslate, locale, function (err, translation) {
+        if(err) {
+            console.log('error translating word in locale : ' + locale);
+            console.log(err);
+        }
+        else {
+            console.log('translated imagename:' + translation.translatedText);
+            callback(locale, translation.translatedText);
+        }
+    });
+}
+
+function GetImages(game, callback) {
 	console.log('in sendToGuestExistingImages'.green);
     var conn = mongoose.createConnection(dburl);
     conn.once('open', function () {

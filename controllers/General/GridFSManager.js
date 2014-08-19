@@ -4,7 +4,6 @@ var giSearch = require('google-image-search');
 var client = require('google-images');
 var fs = require('fs');
 var zlib = require('zlib');
-var dc = require('../Dictionary/DictionaryController');
 //var sleep = require('sleep');
 
 var dbGoogleImagesDatabaseUrl = 'mongodb://social:inter4ever@kahana.mongohq.com:10075/SociaLang-GoogleImagesDatabase'

@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
-
+var colors = require('colors');
 var Levels = require('../../Levels.js').Levels;
 var Languages = require('../../Languages.js').Languages;
 
@@ -35,10 +35,10 @@ exports.LoginFacebook = function (socket) {
                             isFacebookUser : true
                     });
 
-                    for(var index in Languages) {
-                        newUser.stats.push({  points: 0, level: Levels[0], language: Languages[index] });
-                    }
-
+                    for (var i = 0; i < Languages.length; i++) {
+                        newUser.stats.push({  points: 0, level: Levels[0], language: Languages[i] });
+                    };
+                    
                     newUser.save(function(error) {
                         if (error) {
                             console.log("Failed in saving new user : " + error);
@@ -47,7 +47,7 @@ exports.LoginFacebook = function (socket) {
                         }
                         else {
                             socket.set('id', newUser._id, function() {
-                                console.log('set user on socket with id : '+ newUser._id);
+                               console.log('set user on socket with id : '+ newUser._id);
                                jsonResponse = { result : 'OK', User : newUser };
                                socket.emit("LoginResponse", jsonResponse);
                                

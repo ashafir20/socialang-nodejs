@@ -2,14 +2,16 @@ var TTS = require("../General/TTS");
 var Dictionary = require("../Dictionary/DictionaryController");
 var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
 
-var languagesLocales = ['es', 'fr', 'de', 'it', 'nl'];
-/*languagesToLocalMap.put("Spanish", "es");
-languagesToLocalMap.put("Hebrew", "he");
-languagesToLocalMap.put("French", "fr");
-languagesToLocalMap.put("German", "de");
-languagesToLocalMap.put("Italian", "it");
-languagesToLocalMap.put("Dutch", "nl");*/
-
+var languagesLocales = ['es', 'fr', 'de', 'it', 'nl', 'ru', 'el'];
+/*      languagesToLocalMap.put("Spanish", "es");
+        languagesToLocalMap.put("Hebrew", "he");
+        languagesToLocalMap.put("French", "fr");
+        languagesToLocalMap.put("German", "de");
+        languagesToLocalMap.put("Italian", "it");
+        languagesToLocalMap.put("Dutch", "nl");
+        languagesToLocalMap.put("Greek", "el");
+        languagesToLocalMap.put("Russian", "ru");
+*/
 exports.HandleTranslations = function (socket) {
 	socket.on('translateRequest', function (data) {
 		console.log(data);
