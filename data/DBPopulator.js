@@ -3,7 +3,6 @@ var Grid = require('gridfs-stream');
 var fs = require('fs');
 var path = require('path');
 
-//var dburl = 'mongodb://social:inter4ever@kahana.mongohq.com:10025/SociaLang-LocalStorage';
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
 
 Grid.mongo = mongoose.mongo;
