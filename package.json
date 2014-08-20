@@ -8,21 +8,22 @@
     "email": "ashafir20@gmail.com"
   },
   "dependencies": {
+    "colors": "0.6.2",
     "express": "3.x",
+    "google-image-search": "0.1.0",
+    "google-images": "^0.1.0",
+    "google-translate": "0.1.1",
+    "gridfs-stream": "0.5.1",
+    "http-proxy": "^1.1.6",
+    "moment": "^2.8.1",
     "mongodb": "1.3.23",
     "mongoose": "3.8.8",
     "request": "^2.34.0",
-    "colors": "0.6.2",
     "socket.io": "0.9.16",
-    "google-translate": "0.1.1",
-    "gridfs-stream": "0.5.1",
-    "google-image-search": "0.1.0",
-    "socket.io-stream": "0.5.3",
-    "http-proxy": "^1.1.6",
     "socket.io-proxy": "^1.0.3",
-    "util": "^0.10.3",
-    "google-images": "^0.1.0",
-    "stream-buffers": "^0.2.5"
+    "socket.io-stream": "0.5.3",
+    "stream-buffers": "^0.2.5",
+    "util": "^0.10.3"
   },
   "subdomain": "lang.social.com",
   "scripts": {
