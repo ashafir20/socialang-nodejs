@@ -39,6 +39,8 @@ exports.initialize = function(server) {
 
         require('../controllers/General/ClientImagesPopulator').HandleClientImageCachingRequests(socket);
 
+        require('../controllers/Chat/AdvancedChat').HandleAdvancedChat(socket, io);
+
     });
 
 };
