@@ -10,8 +10,13 @@ var MemoryGameSchema = mongoose.Schema ({
     GameRoomID : { type: Number, unique: true },
     Player1Score : { type: Number, default: 0 },
     Player2Score : { type: Number, default: 0 },
-    LastPlay : { type : Date },
-    TimeCreated : { type : Date, default: new Date() },
+    Player1Ready : { type : Boolean , default : false },
+    Player2Ready : { type : Boolean , default : false },
+    RoundNumber :  { type : Number , default : 1 },
+    RematchDetails : { 
+        PlayerInviting : mongoose.Schema.Types.ObjectId,
+        InviteState : { type: String, default: "NoInvite" },
+    },
     ImagesFilenames : [{
         pairId : Number,
         filename : String,

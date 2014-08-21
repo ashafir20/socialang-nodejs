@@ -31,15 +31,27 @@ function UpdateGridFS(gfs) {
 }
 
 function writeFileIfNotExistsAlready(gfs, file) {
+  console.log('attempting to find file: ' + file);
     mongoose.connection.db.collection("fs.files", function (err, collection){
-        collection.find({ filename : file }).toArray(function (err, docs){
-           if(docs == null) {
-              putFile(gfs, file);
-           } else {
-             console.log('file: '+ file + ' exists already in gridfs! not writing this file.');
-           }
-        });
+      checkIfFileInCollection(file, collection, function (exists) {
+        if(!exists){
+          putFile(gfs, file);
+        }
+      });
     });
+}
+
+function checkIfFileInCollection(file, collection, callback) {
+      collection.find({ filename : file }).toArray(function (err, docs) {
+         if(typeof docs !== 'undefined' && docs.length > 0) {
+            console.log('file: '+ file + ' exists already in gridfs! not writing this file.');
+            callback(true);
+         } else {
+            console.log('found : ' + docs.length + ' matching docs for this file!');
+            console.log('its a new file! inserting it to the grid!');
+            callback(false);
+         }
+      });
 }
 
 function putFile (gfs, file) {
@@ -51,7 +63,7 @@ function putFile (gfs, file) {
            //mode: 'w' // write in truncate mode. Existing data will be overwriten.
       });
 
-      //fs.createReadStream(imagesLocalFolderPath + file).pipe(writestream);
+      fs.createReadStream(imagesLocalFolderPath + file).pipe(writestream);
 
       writestream.on('close', function (file) {
           console.log('finished uploading file : ' + file.filename);

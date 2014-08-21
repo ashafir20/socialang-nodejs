@@ -54,7 +54,7 @@ exports.HomeActivityHandler = function(socket) {
                         user.save(function(error) {
                             if(!error) {
                                 console.log("user language was updated with language " + user.learningLanguage);
-                                jsonResponse = { result : "OK" };
+                                jsonResponse = { result : "OK",  language : user.learningLanguage };
                             }
                             else {
                                 console.log("Error: could update user language");

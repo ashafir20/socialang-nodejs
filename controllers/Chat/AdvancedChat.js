@@ -20,7 +20,7 @@ exports.HandleAdvancedChat = function (socket, io) {
 						var jsonResponse = { 
 							 result: 'OK', 
 							 sender : 'SERVER',
-							 message : 'Welcome ' + fullname,
+							 message : 'Welcome to the ' + rooms[0] + ' Room ' + fullname,
 							 date : moment().format("h:mm:ss")
 						};
 
@@ -71,8 +71,9 @@ exports.HandleAdvancedChat = function (socket, io) {
 		});
 	});
 
-	socket.on('AdvancedChatSwitchRoom', function (newroom) {
+	socket.on('AdvancedChatSwitchRoom', function (data) {
 		console.log("in AdvancedChatSwitchRoom");
+		var newroom = data.room;
 		socket.get('id', function (err, id) {
 			if(id) {
 				User.findById(id, function (error, user) {
@@ -120,43 +121,50 @@ exports.HandleAdvancedChat = function (socket, io) {
 		});
 	});
 
-	
 	socket.on('GetAdvancedChatOnlineUsers', function () {
 		socket.get('id', function (err, currentUserId) {
-			var clientInRoom = io.sockets.clients(rooms[0]);
-				var onlineusers = [];
-				console.log(clientInRoom.length + ' clients in room'.silly);
-				for (var i = 0; i < clientInRoom.length; i++) {
-					getUserDetails(clientInRoom[i], currentUserId, function (userDetails) {
-						console.log(userDetails);
-						onlineusers.push(userDetails);
-						if(onlineusers.length == clientInRoom.length) {
-							var jsonResponse = { result : "OK", onlineUsers : onlineusers };
-							socket.emit('GetAdvancedChatOnlineUsersResponse' , jsonResponse);
-						}
-					});
-				};
+			var onlineusers = [];
+			var clientInRoom = io.sockets.clients(socket.room);
+			console.log(clientInRoom.length + ' clients in room'.silly);
+			for (var i = 0; i < clientInRoom.length; i++) {
+				getUserDetails(clientInRoom[i], currentUserId, function (userDetails) {
+					console.log(userDetails);
+					onlineusers.push(userDetails);
+					if(onlineusers.length == clientInRoom.length) {
+						var jsonResponse = { result : "OK", onlineUsers : onlineusers };
+						socket.emit('GetAdvancedChatOnlineUsersResponse' , jsonResponse);
+					}
+				});
+			};	
 		});
 	});
 
 	socket.on('GetAdvancedChatOnlineUsersStats', function () {
 		socket.get('id', function (err, currentUserId) {
-			var stats = [];
-			for (var i = 0; i < rooms.length; i++) {
-				var clientsInRoom = io.sockets.clients(rooms[i]);
-				console.log(clientsInRoom.length + ' clients in room ' + rooms[i]);
-				var room =  rooms[i];
-				var stat = { 
-					'room' : room,
-					'numOfClients' : clientsInRoom.length, 
-				};
-				stats.push(stat);
-			};
-
-			var jsonResponse = { result : "OK", 'stats' : stats };
-			socket.emit('GetAdvancedChatOnlineUsersStatsResponse' , jsonResponse);
+			getStats(function (stats) {
+				var jsonResponse = { result : "OK", 'stats' : stats };
+				socket.emit('GetAdvancedChatOnlineUsersStatsResponse' , jsonResponse);
+			});
 		});
 	});
+
+
+	function getStats(callback) {
+		var stats = [];
+		for (var i = 0; i < rooms.length; i++) {
+			var clientsInRoom = io.sockets.clients(rooms[i]);
+			console.log(clientsInRoom.length + ' clients in room ' + rooms[i]);
+			var room =  rooms[i];
+			var stat = { 
+				'room' : room,
+				'numOfClients' : clientsInRoom.length, 
+			}
+
+			stats.push(stat);
+		}
+
+		callback(stats);
+	}
 
 	socket.on('leaveAdvancedChatRequest', function () {
 		console.log("in leaveAdvancedChatRequest".silly);
@@ -197,21 +205,18 @@ exports.HandleAdvancedChat = function (socket, io) {
 	function getUserDetails(clientInRoom, currentUserId, callback) {
 		console.log('in getUserDetails'.silly);
 	    clientInRoom.get('id', function (err, userid) {
-	        if(userid && currentUserId != userid) {
-		    	User.findById(userid, function (error, user) {
-	        		if(user) 
-	        		{
-	        			var result = {
-	        			 'learningLanguage' : user.learningLanguage,
-	        			 'firstName' :  user.firstName,
-	        			 'lastName' :  user.lastName,
-	        			 'profileid' : user.profileid 
-	        			};
+	    	User.findById(userid, function (error, user) {
+        		if(user) {
+        			var result = {
+        			 'learningLanguage' : user.learningLanguage,
+        			 'firstName' :  user.firstName,
+        			 'lastName' :  user.lastName,
+        			 'profileid' : user.profileid 
+        			};
 
-	        			callback(result);
-	        		}
-		        });
-		     } 
+        			callback(result);
+        		}
+	        });
 	  });
 	}
 }
