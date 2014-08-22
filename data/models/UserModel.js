@@ -12,6 +12,7 @@ var UserSchema = mongoose.Schema({
     username    : String,
     password    : String,
     profileid   : String,
+    uniqueId    : Number,
     online      :  { type: Boolean, default: false },
     friends		: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     friendsRequests : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

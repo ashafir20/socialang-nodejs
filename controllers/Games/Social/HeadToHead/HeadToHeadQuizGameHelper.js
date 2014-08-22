@@ -2,11 +2,21 @@ var mongoose = require('mongoose');
 var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
 var HeadToHeadModel = mongoose.model("HeadToHead");
 
-exports.GetNextRound = function (game, callback){
+/*        languagesToLocalMap.put("Spanish", "es");
+        languagesToLocalMap.put("Hebrew", "he");
+        languagesToLocalMap.put("French", "fr");
+        languagesToLocalMap.put("German", "de");
+        languagesToLocalMap.put("Italian", "it");
+        languagesToLocalMap.put("Dutch", "nl");
+        languagesToLocalMap.put("Greek", "el");
+        languagesToLocalMap.put("Russian", "ru");*/
+
+
+exports.GetNextRound = function (game, locale, callback){
 	HeadToHeadModel.GetRound(function (words) {
 		console.log(words);
 		var round = { Answer :  words[0] };
-		googleTranslate.translate(words[0], 'es', function (err, translation) {
+		googleTranslate.translate(words[0], locale , function (err, translation) {
 			if(err) throw new Error("error in word translate");
 			var question = translation.translatedText;
 			console.log('Question : ' + question);

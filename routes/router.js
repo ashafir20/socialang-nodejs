@@ -7,6 +7,12 @@ exports.initialize = function(server) {
     io.sockets.on('connection', function (socket) {
         console.log('SocketIO connection Established!');
 
+       process.on('exit', function (code) {
+        console.log('About to exit with code:', code);
+            var response = { 'code' : code };
+            socket.emit('connectionstatus', response);
+        });
+
         socket.send(JSON.stringify({
             type : 'serverMessage',
             message : 'Connected to socialLang server!'

@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var colors = require('colors');
 var User = mongoose.model('User');
 var MemoryGameModel = mongoose.model("MemoryGame");
 var HeadToHeadModel = mongoose.model("HeadToHead");
@@ -6,7 +7,6 @@ var Levels = require('../../Levels.js').Levels;
 var LevelPointsMap = require('../../Levels.js').LevelPointsMap;
 
 exports.HomeActivityHandler = function(socket) {
-
     socket.on('userInHomeActivity', function() {
         console.log('in userInHomeActivity');
          socket.get('id', function (err, id) {
@@ -29,20 +29,16 @@ exports.HomeActivityHandler = function(socket) {
          });
      });
 
-
-
-    socket.on('languageLearnUpdate', function(userLanguage) {
+    socket.on('languageLearnUpdate', function (data) {
         var jsonResponse;
+        console.log('in languageLearnUpdate');
         socket.get('id', function (err, id) {
-            if(err)
-            {
+            if(err) {
                 console.log("Error: could not get user id from socket");
                 jsonResponse = { result : "Failed" };
                 socket.emit("languageUpdateResponse", jsonResponse);
             }
-            else if(id)
-            {
-                console.log('main activity for id  :' + id);
+            else if(id) {
                 User.findById(id, function(errorid, user) {
                     if (errorid){
                         console.log("Error: could not find user in database");
@@ -50,7 +46,10 @@ exports.HomeActivityHandler = function(socket) {
                         socket.emit("languageUpdateResponse", jsonResponse);
                     }
                     else {
-                        user.learningLanguage = userLanguage.language;
+
+                        console.log("found user and updating to language : " + data.language);
+                        user.learningLanguage = data.language;
+
                         user.save(function(error) {
                             if(!error) {
                                 console.log("user language was updated with language " + user.learningLanguage);
@@ -60,10 +59,13 @@ exports.HomeActivityHandler = function(socket) {
                                 console.log("Error: could update user language");
                                 jsonResponse = { result : "Failed" };
                             }
+
                             socket.emit("languageUpdateResponse", jsonResponse);
                         });
                     }
                 });
+            } else {
+                console.log("no error and no id for user in languageLearnUpdate");
             }
         });
     });
@@ -71,6 +73,7 @@ exports.HomeActivityHandler = function(socket) {
 
     socket.on('ProfileDetailsRequest', function () {
         var jsonResponse;
+        console.log(socket.id);
         socket.get('id', function (err, id) {
             if(err){
                 console.log("Error: could not get user id from socket");
@@ -103,8 +106,24 @@ exports.HomeActivityHandler = function(socket) {
                         socket.emit("ProfileDetailsResponse", jsonResponse);
                     }
                 });
+            } else {
+                console.log("could not find user id in socket");
             }
         });
+    });
+
+    socket.on('syncUser', function (data) {
+        var uniqueUserId = data.uniqueId;
+        console.log('in syncUser with uniqueUserId : ' + uniqueUserId);
+        User.findOne({ 'uniqueId': Number(uniqueUserId) }, '_id', function (err, user) {
+          if (err) console.log('could not find user in collection!'.error);
+          else {
+             console.log('found user! setting in socket for sync!');
+             socket.set('id', user._id, function () {
+                console.log('id was set in socket!');
+             });
+          }
+        })
     });
 }
 

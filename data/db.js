@@ -10,7 +10,6 @@ var DBPopulator = require('./DBPopulator');
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
 mongoose.connect(dburl);
 
-
 mongoose.connection.on('connected', function () {
     console.log('Mongoose connected to ' + dburl);
     require('../controllers/Games/GameCleaner').CleanGames();

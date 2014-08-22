@@ -4,8 +4,7 @@ var User = mongoose.model('User');
 exports.ProfileActivityHandler = function(socket) {
     socket.on('friendUserDetailsRequest', function (data) {
     	console.log("in friendUserDetailsRequest with data: " + data);
-    	if(data.isFacebookUser)
-    	{
+    	if(data.isFacebookUser) {
     		User.findOne({ "profileid" : data.friendprofileid }, function (err, user) {
     			if(err){
     				console.log("error getting user by profileid");
@@ -17,8 +16,7 @@ exports.ProfileActivityHandler = function(socket) {
     			}
     		});
     	} 
-    	else 
-    	{
+    	else {
 			 User.findOne({ "username" : data.friendusername }, function (err, user) {
 			 	if(err){
 			 		console.log("error getting user by profileid");

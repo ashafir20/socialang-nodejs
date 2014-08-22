@@ -2,7 +2,7 @@ var TTS = require("../General/TTS");
 var Dictionary = require("../Dictionary/DictionaryController");
 var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
 
-var languagesLocales = ['es', 'fr', 'de', 'it', 'nl', 'ru', 'el'];
+var languagesLocales = ['es', 'fr', 'de', 'it', 'nl', 'ru', 'el', 'he'];
 /*      languagesToLocalMap.put("Spanish", "es");
         languagesToLocalMap.put("Hebrew", "he");
         languagesToLocalMap.put("French", "fr");
@@ -12,6 +12,7 @@ var languagesLocales = ['es', 'fr', 'de', 'it', 'nl', 'ru', 'el'];
         languagesToLocalMap.put("Greek", "el");
         languagesToLocalMap.put("Russian", "ru");
 */
+
 exports.HandleTranslations = function (socket) {
 	socket.on('translateRequest', function (data) {
 		console.log(data);
@@ -29,8 +30,7 @@ exports.HandleTranslations = function (socket) {
 				console.log('translate text : ' + translatedText);
 				ttsWord(locale, translatedText, function (ttsAudioData, languageLocale, translatedText) {
 					results.push({ tts : ttsAudioData, locale : languageLocale, text :  translatedText });
-					if(results.length == languagesLocales.length){
-						//finished
+					if(results.length == languagesLocales.length) {
 						var jsonResponse = { result : "OK", translations : results };
 						socket.emit('translateResponse', jsonResponse);
 					}

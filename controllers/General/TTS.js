@@ -40,6 +40,7 @@ exports.TranslateToSpeech = function (languageLocale, word, callback) {
             console.log('tts translation completed!');
        		callback(data, languageLocale, word);
 		 } else{
+		 	callback(null, languageLocale, word);
 		 	console.log("TTS Failed");
 		 }
 	}).pipe(myWritableStreamBuffer);

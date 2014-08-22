@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var HeadToHeadModel = mongoose.model("HeadToHead");
 var User = mongoose.model('User');
 var colors = require('colors');
-
+var Dictionary = require("../../../Dictionary/DictionaryController");
 var GameHelper  = require('./HeadToHeadQuizGameHelper');
 
 exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
@@ -11,7 +11,8 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 		socket.get('gameRoomID', function (err, gameRoomID) {
 			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
 				if(err) throw new Error('no game room found');
-				GameHelper.GetNextRound(game, function (headToHeadRound) {
+				var locale = Dictionary.GetLanguageLocale(game.Player1.learningLanguage);
+				GameHelper.GetNextRound(game, locale, function (headToHeadRound) {
 					var jsonResponse = { result : "OK" , round : headToHeadRound };
 					io.sockets.in("HTH" + gameRoomID).emit('roundResponse', jsonResponse);
 				});
