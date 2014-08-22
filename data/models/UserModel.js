@@ -32,9 +32,9 @@ var UserSchema = mongoose.Schema({
 UserSchema.statics.UpdatePoints = function(userId, points) {
     this.findById(userId, function (err, user) {
         if(user) {
-           for (var i = 0; i < stats.length; i++) {
-               if(stats[i].language == user.learningLanguage) {
-                    stats[i].points += points;
+           for (var i = 0; i < user.stats.length; i++) {
+               if(user.stats[i].language == user.learningLanguage) {
+                    user.stats[i].points += points;
                     user.save(function (err) {
                         if(!err) {
                             console.log('updated user points and saved!');
