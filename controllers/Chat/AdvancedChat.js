@@ -9,12 +9,17 @@ exports.HandleAdvancedChat = function (socket, io) {
 	socket.on('JoinAdvancedChatRequest', function (data) {
 		console.log("in JoinAdvancedChatRequest");
 		socket.get('id', function (err, id) {
-			if(id){
+			if(err) console.log('error getting id from socket'.error);
+			else if(id){
 				User.findById(id, function (error, user) {
-					if(user) {
+					if(user) 
+					{
 						socket.join(rooms[0]);
 						//store the room name in the socket session for this client
 						socket.room = rooms[0];
+
+						console.log("joined room : ".silly + socket.room);
+
 						var fullname = user.firstName + " " + user.lastName;
 
 						var jsonResponse = { 
@@ -45,6 +50,10 @@ exports.HandleAdvancedChat = function (socket, io) {
 
 	        			var jsonResponse = { result : "OK", 'user' : newConnectedUserDetails , 'method' : "ADD" };
 	        			socket.broadcast.to(rooms[0]).emit('advancedChatOnlineUsersUpdate', jsonResponse);
+					}
+					else 
+					{
+						console.log('error finding user in collection'.error);
 					}
 				});
 			}
@@ -127,7 +136,7 @@ exports.HandleAdvancedChat = function (socket, io) {
 			var clientInRoom = io.sockets.clients(socket.room);
 			console.log(clientInRoom.length + ' clients in room'.silly);
 			for (var i = 0; i < clientInRoom.length; i++) {
-				getUserDetails(clientInRoom[i], currentUserId, function (userDetails) {
+				getUserDetails(clientInRoom[i], function (userDetails) {
 					console.log(userDetails);
 					onlineusers.push(userDetails);
 					if(onlineusers.length == clientInRoom.length) {
@@ -140,11 +149,9 @@ exports.HandleAdvancedChat = function (socket, io) {
 	});
 
 	socket.on('GetAdvancedChatOnlineUsersStats', function () {
-		socket.get('id', function (err, currentUserId) {
-			getStats(function (stats) {
-				var jsonResponse = { result : "OK", 'stats' : stats };
-				socket.emit('GetAdvancedChatOnlineUsersStatsResponse' , jsonResponse);
-			});
+		getStats(function (stats) {
+			var jsonResponse = { result : "OK", 'stats' : stats };
+			socket.emit('GetAdvancedChatOnlineUsersStatsResponse' , jsonResponse);
 		});
 	});
 
@@ -175,6 +182,8 @@ exports.HandleAdvancedChat = function (socket, io) {
 					{
 						var fullname = user.firstName + " " + user.lastName;
 						// leave the current room (stored in session)
+
+						console.log('leaving room : ' + socket.room);
 						socket.leave(socket.room);
 
 						var jsonResponse = { 
@@ -201,8 +210,14 @@ exports.HandleAdvancedChat = function (socket, io) {
 		});
 	});
 
+    socket.on('disconnect', function () {
+        console.log('user disconnected...'.silly);
+        console.log('trying to remove from chat room'.silly);
+ 		socket.leave(socket.room);
+    });
 
-	function getUserDetails(clientInRoom, currentUserId, callback) {
+
+	function getUserDetails(clientInRoom, callback) {
 		console.log('in getUserDetails'.silly);
 	    clientInRoom.get('id', function (err, userid) {
 	    	User.findById(userid, function (error, user) {

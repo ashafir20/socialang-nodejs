@@ -4,7 +4,9 @@ var fs = require('fs');
 var path = require('path');
 
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
-var imagesLocalFolderPath = "Images/Upload/Animals/"
+
+//var imagesLocalFolderPath = "Images/Upload/Animals/"
+var imagesLocalFolderPath = "Images/Upload/Food/"
 
 Grid.mongo = mongoose.mongo;
 

@@ -35,6 +35,9 @@ UserSchema.statics.UpdatePoints = function(userId, points) {
         if(user) {
            for (var i = 0; i < user.stats.length; i++) {
                if(user.stats[i].language == user.learningLanguage) {
+                    if(typeof points == 'string' || points instanceof String){
+                        points = Number(points);
+                    }
                     user.stats[i].points += points;
                     user.save(function (err) {
                         if(!err) {

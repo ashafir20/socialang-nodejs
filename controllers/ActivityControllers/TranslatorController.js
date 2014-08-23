@@ -38,6 +38,18 @@ exports.HandleTranslations = function (socket) {
 			});
 		}
 	});
+
+	socket.on('languageDetectionRequest', function (data) {
+		console.log(data);
+		googleTranslate.detectLanguage(data.word, function (err, detection) {
+			if(err) console.log('error in detecting language');
+		    else {
+		    	console.log(detection.language);
+		    	var jsonResponse = { 'result' : "OK", 'detectedLanguage' : detection.language };
+		    	socket.emit('languageDetectionResponse', jsonResponse);
+		    }
+		 });
+	});
 }
 
 function ttsWord(locale, ttsText, callback) {

@@ -27,7 +27,6 @@ exports.GetNextRound = function (game, locale, callback){
 			game.LastRound = round;
 			game.save(function (errSaving){
 				if(errSaving) if(err) throw new Error('error saving game when getting next round');
-				console.log('game saved! : ' + game);
 				callback(game.LastRound);
 			});
 		});	
@@ -36,11 +35,11 @@ exports.GetNextRound = function (game, locale, callback){
 
 exports.IsAnswerCorrect = function (game, answer) {
 	if(game) {
-		console.log('in IsAnswerCorrect with answer : ' + answer);
-		console.log('in IsAnswerCorrect with last round as : ' + game.LastRound);
-		var answerStatus = game.LastRound.Answer === answer;
-		console.log('in IsAnswerCorrect returnning  : ' + answerStatus);
-		return answerStatus;
+		if(game.LastRound.Answer === answer){
+			return true;
+		} else {
+			return false;
+		}
 	} else {
 		console.log('no game entered for IsAnswerCorrect');
 	}
@@ -61,28 +60,33 @@ function HandleWrongAnswer (game) {
 
 
 function HandleCorrectAnswer(game) {
-	if(game) {
-		if(game.CurrentPlayerTurn == 1) {
-			game.Player1NumOfHearts++;
-		} else {
-			game.Player2NumOfHearts++;
-		}
-	} else {
-		console.log('no game entered for HandleCorrectAnswer');
-	}
+	//if(game) {
+		//if(game.CurrentPlayerTurn == 1) {
+			//game.Player1NumOfHearts++;
+		//} else {
+			//game.Player2NumOfHearts++;
+		//}
+	//} else {
+		//console.log('no game entered for HandleCorrectAnswer');
+	//}
 
 }
 
 
 exports.SubmitPlayerAnswer = function(game, answer, callback) {
 	if(game) {
-		console.log('submitting player answer in game : ' + game);
 		if(answer === game.LastRound.Answer){
 			HandleCorrectAnswer(game);
 		} else {
 			HandleWrongAnswer(game);
 		}
-		game.CurrentPlayerTurn == game.CurrentPlayerTurn == 1 ? 2 : 1;
+
+		if(game.CurrentPlayerTurn == 1){
+			game.CurrentPlayerTurn = 2;
+		} else {
+			game.CurrentPlayerTurn = 1;
+		}
+		
 		game.save(function (err) {
 			if(err) throw new Error('error saving game when submitting answer!');
 			console.log('game saved after submitting answer!');

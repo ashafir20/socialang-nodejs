@@ -52,7 +52,7 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 							});
 						}
 					}
-				})
+				});
 			});
 		});
 	});

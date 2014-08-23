@@ -12,6 +12,10 @@ var HeadToHeadQuizGameSchema = mongoose.Schema ({
     CurrentPlayerTurn :  { type: Number, default: 1 },
     GameState : {type : String, enum : GameStates },
     GameRoomID : { type: Number, unique: true },
+    RematchDetails : { 
+        PlayerInviting : mongoose.Schema.Types.ObjectId,
+        InviteState : { type: String, default: "NoInvite" },
+    },
     LastRound : { 
         Q : String,
         A : [String],
