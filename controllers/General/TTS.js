@@ -20,13 +20,10 @@ exports.TranslateToSpeech = function (languageLocale, word, callback) {
 
 //private function
  function TTS(languageLocale, word, callback) {
- 	//var currentTime = new Date();
-	//var realname = currentTime.getTime() + ".mp3";
-
-	//example
-	//var url = "http://translate.google.com/translate_tts?tl=en&q=hello%20world";
 
 	var url = "http://translate.google.com/translate_tts?tl=" + languageLocale + "&q=" + word;
+
+	console.log(url);
 
 	var myWritableStreamBuffer = new streamBuffers.WritableStreamBuffer({
     	initialSize: (100 * 1024),      // start as 100 kilobytes.
@@ -44,23 +41,5 @@ exports.TranslateToSpeech = function (languageLocale, word, callback) {
 		 	console.log("TTS Failed");
 		 }
 	}).pipe(myWritableStreamBuffer);
-
-	//var wstream = fs.createWriteStream('./data/tts.mp3');
-
-/*	var r = request(url, function(error, response, buffer) {
-		if (!error && response.statusCode == 200) {
-		    console.log("TTS OK");
-		 } else{
-		 	console.log("TTS Failed");
-		 }
-	}).pipe(wstream);
-
-    wstream.on('finish', function () {
-       console.log('tts audio has been recieved!');
-       console.log('tts translation completed!');
-       var jsonResponse = { result : "OK" , tts : data };
-       //socket.emit("TTSResponse", jsonResponse);
-    });*/
-
 
  }

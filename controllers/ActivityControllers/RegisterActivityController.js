@@ -30,9 +30,13 @@ exports.Signup = function (socket) {
                  Counters.findOneAndUpdate({ name: "User" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
                  {  
                         var newUser = new User({
-                            'username': userData.username, 'password': userData.password,
-                            'firstName' : firstName, 'lastName' : lastName,
-                            'isFacebookUser' : false, 'learningLanguage' : userData.learningLanguage
+                            'username': userData.username,
+                            'password': userData.password,
+                            'firstName' : firstName,
+                            'lastName' : lastName,
+                            'isFacebookUser' : false,
+                            'learningLanguage' : userData.learningLanguage,
+                            'uniqueId' : result.counter,
                         });
 
                         for(var index in Languages) {

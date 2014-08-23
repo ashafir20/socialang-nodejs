@@ -7,7 +7,7 @@ var zlib = require('zlib');
 var dc = require("../Dictionary/DictionaryController");
 //var sleep = require('sleep');
 
-var dbGoogleImagesDatabaseUrl = 'mongodb://social:inter4ever@kahana.mongohq.com:10075/SociaLang-GoogleImagesDatabase'
+var dbGoogleImagesDatabaseUrl = 'mongodb://social:inter4ever@kahana.mongohq.com:10090/socialang-google';
 
 exports.GetImageByName = function (socket) {
         socket.on('getImage', function (filename) {
