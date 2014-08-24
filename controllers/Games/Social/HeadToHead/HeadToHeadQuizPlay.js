@@ -61,15 +61,17 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 						if(errorId) console.log('couldnt find userid in MemoryGameRematchRequest'.error);
 						else if(id)
 						{
-							if(game.RematchDetails.InviteState == "NoInvite") {
+							if(game.RematchDetails.InviteState == "NoInvite") 
+							{
 								game.RematchDetails.InviteState = "RematchRequested";
 								game.RematchDetails.PlayerInviting = id;
 								game.save(function  (error) {
 									if(!error) console.log('game was saved! with a new rematch invite'.silly);
 								});
 							} 
-							else if(game.RematchDetails.InviteState = "RematchRequested") {
-								jsonResponse = { result : "OK", rematch : "RematchAccepted" };
+							else if(game.RematchDetails.InviteState == "RematchRequested") 
+							{
+								var jsonResponse = { result : "OK", rematch : "RematchAccepted" };
 								io.sockets.in("HTH" + gameRoomID).emit('HeadToHeadRematchResponse', jsonResponse);
 								game.RematchDetails.InviteState = "NoInvite";
 
@@ -82,10 +84,30 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 										console.log('game was saved! '.silly);
 									}
 								});
-							}
+							} 
+/*							else if(game.RematchDetails.InviteState == 'RematchDeclined')
+							{
+								var jsonResponse = { result : "OK" , rematch : "RematchDeclined" };
+								socket.emit('HeadToHeadRematchResponse', jsonResponse);
+							}*/
 						}
 					});
 				});
+		});
+
+
+	socket.on('HeadToHeadRematchDeniedNotify', function () {
+		socket.get('gameRoomID', function (err, gameRoomID) {
+			if(err) throw new Error('no game room found');
+			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
+				if(err) throw new Error('no game room found');
+				game.RematchDetails.InviteState == "RematchDeclined" 
+				game.save(function  (error) {
+					if(!error) {
+						console.log('game was saved! '.silly);
+					}
+				});
+			});
 		});
 	});
 };
