@@ -49,6 +49,6 @@ server.listen(app.get('port'), app.get('ipaddress'), function(){
 });
 
 //SOCKET.IO INITIALIZE
-var router = require('./routes/router.js');
+var router = require('./router.js');
 router.initialize(server);
 

@@ -13,6 +13,7 @@ var MemoryGameSchema = mongoose.Schema ({
     Player1Ready : { type : Boolean , default : false },
     Player2Ready : { type : Boolean , default : false },
     RoundNumber :  { type : Number , default : 1 },
+    HostIsReady :  { type : Boolean , default : false },
     RematchDetails : { 
         PlayerInviting : mongoose.Schema.Types.ObjectId,
         InviteState : { type: String, default: "NoInvite" },

@@ -39,7 +39,7 @@ function getVariableFromSocket(socket, key, callback) {
 }
 
 
-exports.HandleClientImageCachingRequests = function (socket) {
+exports.HandleClientImageCachingRequests = function (socket, io) {
     socket.on('MGImagesRequest', function (data) {
     	console.log('in MGImagesRequest'.green);
     	//calling from client room activity
@@ -48,7 +48,8 @@ exports.HandleClientImageCachingRequests = function (socket) {
     			MemoryGameModel.findByGameRoomID(gameRoomID, function (err, game) {
                     if(err) throw new Error('game was not found!');
     				else if(!err) console.log('game was found'.green);
-    				if(data.isHost == 'true') {
+    				if(data.isHost == 'true') 
+                    {
     					console.log('user is host'.green);
     					GetRandomizedImages(game, function (results) {
                             SaveImagesToGameDocument(results, game);
@@ -58,7 +59,9 @@ exports.HandleClientImageCachingRequests = function (socket) {
                             });
                             //clear images from document
                         });
-    				} else {
+    				} 
+                    else 
+                    {
     					console.log('user is guest'.green);
     					GetImages(game, function (results) {
                             if(results != null){
@@ -76,6 +79,55 @@ exports.HandleClientImageCachingRequests = function (socket) {
     			});
     		}
     	});
+    });
+
+    socket.on('guestRepoIsFilledAndReady', function (data) {
+        console.log('in guestRepoIsFilledAndReady'.green);
+        //emit to both to start
+         socket.get('gameRoomID', function (err, gameRoomID) {
+              if(err) console.log('error finding game'.error);
+              else {
+                var jsonResult = { result : "OK" };
+                io.sockets.in("MG" + gameRoomID).emit('PlayersAreReadyResponse', jsonResult);
+             }
+         });
+    });
+
+    socket.on('hostRepoIsFilledAndReady', function (data) {
+        console.log('in hostRepoIsFilledAndReady'.green);
+         socket.get('gameRoomID', function (err, gameRoomID) {
+             MemoryGameModel.findByGameRoomID(gameRoomID, function (error, game) {
+                if(error) console.log('error finding game'.error);
+                  else {
+                    var jsonResult = { result : "OK" };
+                    socket.broadcast.to("MG" + gameRoomID).emit('HostCompletedLoadingImagesStage', jsonResult);
+                    game.HostIsReady = true;
+                    game.save(function (errorsave) {
+                       if(!errorsave) console.log('game saved with host ready'.silly);
+                    });
+                }
+            });
+         });
+    });
+
+        socket.on('checkIfHostIsReady', function (data) {
+        console.log('in checkIfHostIsReady'.green);
+         socket.get('gameRoomID', function (err, gameRoomID) {
+             MemoryGameModel.findByGameRoomID(gameRoomID, function (error, game) {
+                if(error) console.log('error finding game'.error);
+                  else 
+                  {
+                    var jsonResult;
+                    if(game.HostIsReady == true) {
+                       jsonResult = { result : "OK" };
+                    } else {
+                        jsonResult = { result : "Failed" };
+                    }
+
+                    socket.emit('checkIfHostIsReadyResponse' , jsonResult);
+                }
+            });
+         });
     });
 }
 
@@ -171,6 +223,7 @@ function GetRandomizedImages(game, callback) {
 
 function SaveImagesToGameDocument(results, game) {
     console.log('in SaveImagesToGameDocument'.silly);
+    game.ImagesFilenames = [];
 	for (var i = 0; i < results.length; i++) {
         console.log('pushed ' + results[i].filename + " to document images array".green);
 		game.ImagesFilenames.push({ 'filename' : results[i].filename, 'pairId' : results[i].pairId });

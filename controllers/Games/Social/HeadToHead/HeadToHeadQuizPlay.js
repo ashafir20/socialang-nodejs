@@ -94,7 +94,7 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 					});
 				});
 		});
-
+	});
 
 	socket.on('HeadToHeadRematchDeniedNotify', function () {
 		socket.get('gameRoomID', function (err, gameRoomID) {
@@ -110,5 +110,5 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 			});
 		});
 	});
-};
+}
 

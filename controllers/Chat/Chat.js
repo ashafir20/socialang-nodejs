@@ -1,4 +1,4 @@
-/*var RoomPrefixes = {
+var RoomPrefixes = {
     HeadToHead : "HTH",
     StudentTeacher : "ST",
     MemoryGame : "MG"
@@ -34,4 +34,3 @@ exports.ChatHandler = function (socket, io) {
 	});
 }
 
-*/
