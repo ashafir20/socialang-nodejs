@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Grid = require('gridfs-stream');
 var MemoryGameModel = mongoose.model("MemoryGame");
+var User = mongoose.model("User");
 var colors = require('colors');
 var dburl = 'mongodb://social:inter4ever@linus.mongohq.com:10039/SocialLang';
 var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
@@ -51,7 +52,7 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
     				if(data.isHost == 'true') 
                     {
     					console.log('user is host'.green);
-    					GetRandomizedImages(game, function (results) {
+    					GetRandomizedImages(8, function (results) {
                             SaveImagesToGameDocument(results, game);
                             convertWordsToLearningLanguage(game.Player1.learningLanguage, results, function (results) {
                                 var jsonResult = { result : "OK", images : results };
@@ -81,6 +82,26 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
     	});
     });
 
+    socket.on('PGImagesRequest', function (data) {
+        console.log('in PGImagesRequest'.green);
+        socket.get('id', function (error, userid) {
+            if(error) console.log('error getting id from socket'.error);
+            else if(userid)  {
+                User.findById(userid, function (errorGettingUser, user) {
+                    if(errorGettingUser) console.log('error getting user'.error);
+                    else if(user) {
+                       GetRandomizedImages(4, function (results) {
+                          convertWordsToLearningLanguage(user.learningLanguage, results, function (results) {
+                            var jsonResult = { result : "OK", images : results };
+                            socket.emit('PGImagesResponse', jsonResult);
+                          });
+                      });
+                    }
+                });
+            }
+        });
+    });
+    
     socket.on('guestRepoIsFilledAndReady', function (data) {
         console.log('in guestRepoIsFilledAndReady'.green);
         //emit to both to start
@@ -208,13 +229,13 @@ function GetImages(game, callback) {
 
 
 
-function GetRandomizedImages(game, callback) {
+function GetRandomizedImages(numOfImages, callback) {
 	console.log('in randomizeAndSendToHost'.green);
 	var conn = mongoose.createConnection(dburl);
 	conn.once('open', function () {
 	  var gfs = Grid(conn.db);
 	  GetAllImageFileNamesInDatabase(gfs, function (filenames) {
-			GetRandomImageFiles(gfs, filenames, function  (results) {
+			GetRandomImageFiles(numOfImages, gfs, filenames, function  (results) {
                 callback(results);
 			});
 		});
@@ -242,16 +263,15 @@ function SaveImagesToGameDocument(results, game) {
 
 
 
-function GetRandomImageFiles(gfs, filenames, callback) {
+function GetRandomImageFiles(numOfImages, gfs, filenames, callback) {
 	var results = [];
     var alreadyTakenFilenames = [];
-	for (var pairid = 1; pairid <= 8 ; pairid++) 
-    {
+	for (var pairid = 1; pairid <= numOfImages ; pairid++)  {
         var randDoc = getRandomImageFromArray(filenames, alreadyTakenFilenames);
 		console.log('random file choosen is: ' + randDoc.filename);
 		GetImageFromGridFS(gfs, randDoc.filename, pairid ,function  (filename, pairId, data) {
 			results.push({ 'filename' : filename, 'data': data , 'pairId' : pairId });
-			if(results.length == 8) {
+			if(results.length == numOfImages) {
 				callback(results);
 			}
 		});

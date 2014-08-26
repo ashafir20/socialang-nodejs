@@ -4,7 +4,7 @@ var Counters = mongoose.model("Counter");
 var colors = require('colors');
 
 exports.MemoryGameRoutesHandler = function (socket, io) {
-	socket.on('MemoryGameRoundRequest', function () {
+/*	socket.on('MemoryGameRoundRequest', function () {
 		socket.get('gameRoomID', function (err, gameRoomID) {
 			MemoryGame.findByGameRoomID(gameRoomID, function (error, game) {
 				if(err) console.log('couldnt find userid in MemoryGameRematchRequest'.error);
@@ -14,7 +14,7 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 				});
 			});
 		});
-	});
+	});*/
 
 	socket.on('MemoryGameRematchRequest', function () {
 		socket.get('gameRoomID', function (err, gameRoomID) {
@@ -137,7 +137,7 @@ exports.MemoryGameRoutesHandler = function (socket, io) {
 };
 
 
-function GetNextRound(game, callback){
+/*function GetNextRound(game, callback){
 
 	//length = 8
 	var round = [
@@ -152,4 +152,4 @@ function GetNextRound(game, callback){
 	 ];	
 
 	 callback(round); 
-}
+}*/
