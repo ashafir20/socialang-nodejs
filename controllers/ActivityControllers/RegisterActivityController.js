@@ -39,9 +39,9 @@ exports.Signup = function (socket) {
                             'uniqueId' : result.counter,
                         });
 
-                        for(var index in Languages) {
-                            newUser.stats.push({  points: 0, level: Levels[0], language: Languages[index] });
-                        }
+                       for (var i = 0; i < Languages.length; i++) {
+                            newUser.stats.push({  points: 0, level: Levels[0], language: Languages[i] });
+                        };
 
                         newUser.save(function (error, newUser){
                             if(error){
@@ -60,27 +60,6 @@ exports.Signup = function (socket) {
         });
     });
 
-/*    socket.on('checkUniqueUsernameRequest',function (userData) {
-        console.log('checking username unique : : ' + userData.username);
-        var jsonResponse;
-        User.findOne({ 'username' : userData.username }, function (err, user) {
-            if(err){
-                console.log('checkUniqueUsernameRequest error');
-                jsonResponse = {result : 'Failed', isUsernameUnique : false };
-                socket.emit("checkUniqueUsernameResponse", jsonResponse);
-            }
-            else if(user){
-                console.log('username is not unique');
-                jsonResponse = {result : 'OK', isUsernameUnique : false };
-                socket.emit("checkUniqueUsernameResponse", jsonResponse);
-            }
-            else{
-                console.log('username is unique');
-                jsonResponse = {result : 'OK', isUsernameUnique : true };
-                socket.emit("checkUniqueUsernameResponse", jsonResponse);
-            }
-        });
-    });*/
 };
 
 
