@@ -45,7 +45,7 @@ exports.initialize = function(server) {
 
         require('./controllers/General/ClientImagesPopulator').HandleClientImageCachingRequests(socket, io);
 
-        require('./controllers/General/UserController').HandlerUserDetailsRequests(socket);
+        require('./controllers/General/UserController').HandlerUserDetailsRequests(socket, io);
 
         require('./controllers/Chat/AdvancedChat').HandleAdvancedChat(socket, io);
 

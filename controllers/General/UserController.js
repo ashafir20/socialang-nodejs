@@ -1,10 +1,11 @@
 var mongoose = require('mongoose');
 var User = mongoose.model("User");
+var colors = require("colors");
 
 //GetUserDetailsRequest
 //GetUserDetailsResponse
 
-exports.HandlerUserDetailsRequests = function (socket) {
+exports.HandlerUserDetailsRequests = function (socket, io) {
     socket.on('GetUserDetailsRequest', function (data) {
         var uniqueid = data.UserUniqueId;
         console.log('in GetUserDetailsRequest');
@@ -40,4 +41,66 @@ exports.HandlerUserDetailsRequests = function (socket) {
           }
         });
     });
+
+    
+
+
+
+    //catching the same emit key as community controller -> community only saves message to reciever user document
+    //this function is for online messaging
+/*    socket.on('sendNewMessageRequest', function (data) {
+       console.log(data);
+        socket.get('id', function (err, senderid) {
+            if(senderid) 
+            {
+                console.log('in UserController sendNewMessageRequest');
+                var allConnectedSockets = io.sockets.clients();
+                for (var i = 0; i < allConnectedSockets.length; i++) 
+                {
+                    console.log(allConnectedSockets[i].id);
+                    if(allConnectedSockets[i].id)
+                    {
+                      findUserForThisSocket(allConnectedSockets[i], allConnectedSockets[i].id, function (reciever, recieversSocket)
+                      {
+                          if(reciever)
+                          {
+                            sendNotificationToUser(reciever, recieversSocket, data);
+                          }
+                      });
+                    }
+
+                    allConnectedSockets[i].get('id',function (errorid, id) {
+                       findUserForThisSocket(allConnectedSockets[i], id);
+                    });
+                    
+                }
+            }
+        });
+    });
+
+
+    function sendNotificationToUser(reciever, recieversSocket, data) {
+        console.log(reciever + "".green);
+        console.log(data + + "".green);
+    }
+
+    function findUserForThisSocket(recieverSocket, id, callback) {
+        console.log('trying to find user with id: ' + id + "".silly);
+        User.findById(id, function (error, user) 
+        {
+            if(user && user.online && user.uniqueId == Number(data.uniqueId))
+            {
+                console.log('found the online reciever! lets send him a message');
+                callback(user);
+            } 
+            else
+            {
+                callback(null);
+            }
+        });
+    }
+*/
+
 }
+
+

@@ -32,6 +32,7 @@ exports.CommunityHandler = function(socket, io) {
     socket.on('sendNewMessageRequest', function(data) {
         socket.get('id', function (err, userId) {
             if(userId) {
+                console.log('in community sendNewMessageRequest');
                 putMessageToReciver(userId, data, socket);
             }
         });
@@ -336,7 +337,7 @@ function putMessageToReciver(userId, data, socket){
                         });
                         jsonResponse = {result : 'OK'};
                         socket.emit('sendMessageConfirmationResponse', jsonResponse);
-                    }
+                      }
                     });
                 });
             }

@@ -11,6 +11,10 @@ exports.LoginFacebook = function (socket) {
         console.log('got facebook login request with userData : ' 
             + userFacebookData.profileid + " " + userFacebookData.firstName + " " + userFacebookData.lastName);
 
+
+    ////////////////////////////////////////////
+    //Exisitng facebook user login
+    ///////////////////////////////////
         User.findOne({ 'profileid': userFacebookData.profileid },
             function (err,user) {
                 if (err) {
@@ -30,7 +34,7 @@ exports.LoginFacebook = function (socket) {
                 else
                 {
                     ////////////////////////////////////////////
-                    //CREATING NEW APP USER 
+                    //CREATING NEW APP facebook USER 
                     ///////////////////////////////////
                      Counters.findOneAndUpdate({ name: "User" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
                      {  
