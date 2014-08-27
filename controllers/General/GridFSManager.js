@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var giSearch = require('google-image-search');
-var client = require('google-images');
+var client = require('../google-images');
 var dc = require("../Dictionary/DictionaryController");
 
 exports.GetImageByName = function (socket) {

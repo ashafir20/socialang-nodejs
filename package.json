@@ -11,7 +11,6 @@
     "colors": "0.6.2",
     "express": "3.x",
     "google-image-search": "0.1.0",
-    "google-images": "^0.1.0",
     "google-translate": "0.1.1",
     "gridfs-stream": "0.5.1",
     "http-proxy": "^1.1.6",
