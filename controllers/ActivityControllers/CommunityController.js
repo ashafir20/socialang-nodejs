@@ -57,7 +57,7 @@ exports.CommunityHandler = function(socket, io) {
     socket.on('onlineUsersRequest', function() {
         socket.get('id', function (err, userId) {
             if(userId) {
-                getOnlineUsers(userId, socket);
+                getOnlineUsers(io, userId, socket);
             }
         });
     });
@@ -250,13 +250,40 @@ function putFriendRequestToReciver(userId, data, socket) {
 
 
 
-function getOnlineUsers(userId, socket) {
-    User.find({ "online" : true}, function (err, usersOnlineArray) {
+function getOnlineUsers(io, userId, socket) {
+    var onlineUsers = [];
+    console.log('in getOnlineUsers');
+    var inserted = 0;
+    var clients = io.sockets.clients(); //all connected clients
+    for (var i = 0; i < clients.length; i++) 
+    {
+        console.log(clients[i].id);
+        clients[i].get('id', function (err, userid)
+        {
+            if(userid)
+            {
+                User.findById(userid, function (error, user) 
+                {
+                    if(user) 
+                    {
+                        onlineUsers.push(user);
+                        if(++inserted == clients.length)
+                        {
+                            var jsonResponse = { 'result' : 'OK', 'onlineUsersArray' : onlineUsers };
+                            socket.emit('onlineUsersResponse', jsonResponse);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+/*    User.find({ "online" : true}, function (err, usersOnlineArray) {
         if(usersOnlineArray) {
             jsonResponse = {result : 'OK', onlineUsersArray : usersOnlineArray};
             socket.emit('onlineUsersResponse', jsonResponse);
         }
-    });
+    });*/
         
 }
 
@@ -303,7 +330,7 @@ function deleteMessage(userId, data, socket){
     User.update(
         { _id: userId },
         { $pull: {messages: { messageId: data.msgid } } },
-        function(error, val) {
+        function (error, val) {
             if(error){
                 console.log(error);
                 jsonResponse = {result : 'Failed'};
@@ -318,7 +345,7 @@ function deleteMessage(userId, data, socket){
 
 
 function putMessageToReciver(userId, data, socket){
-    User.findById(userId, function (errorid, currentUser) {
+/*    User.findById(userId, function (errorid, currentUser) {
         if(!errorid){
             if(data.facebookUser == "true") {
                 User.findOne({ "profileid" : data.profileid }, function (err, user) {
@@ -363,7 +390,7 @@ function putMessageToReciver(userId, data, socket){
                 });
             }
         }
-    });
+    });*/
 }
 
 

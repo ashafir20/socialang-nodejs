@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var User = mongoose.model("User");
 
+
 exports.disconnectHandler = function(socket) {
 
     socket.on('disconnect', function () {
@@ -13,6 +14,7 @@ exports.disconnectHandler = function(socket) {
         	}
         });
     });
+
 
 /*    socket.on('onlineupdate', function () {
         console.log('in onlineupdate...');
