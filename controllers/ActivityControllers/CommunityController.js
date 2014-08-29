@@ -194,10 +194,14 @@ function getFriendsRequestListByUserId(userId, socket) {
             console.log("error getting friends".error);
             console.log(error);
         }
-        else if(user){
+        else if(user)
+        {
+
             console.log(user);
             jsonResponse = {result : 'OK', friendsRequestList : user.friendsRequests};
             socket.emit('friendsRequestsListRespone', jsonResponse);
+
+
         }else{
             console.log("could not find user by id".error);
         }

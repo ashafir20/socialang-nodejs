@@ -14,17 +14,5 @@ exports.disconnectHandler = function(socket) {
         	}
         });
     });
-
-
-/*    socket.on('onlineupdate', function () {
-        console.log('in onlineupdate...');
-        socket.get('id', function (err, userId) {
-            if(userId) {
-                User.findById(userId, function (error, user){
-                    user.SaveAsConnected(true);
-                });
-            }
-        });
-    });*/
     
 }

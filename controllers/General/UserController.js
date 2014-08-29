@@ -96,6 +96,28 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
           });
       });  
 
+    setInterval(function()
+    {
+          var clients = io.sockets.clients(); //all connected sockets
+          for (var i = 0; i < clients.length; i++) 
+          {
+                clients[i].get('id', function (err, id)
+                {
+                    if(id)
+                    {
+                      User.findById(id, function (error, user) 
+                      {
+                        if(user)
+                        {
+                          user.online = true;
+                          user.save();
+                        }
+                      });
+                    }
+                });
+           }
+    }, 10000); //every 10 seconds we refresh the online users
+    
 
     function sendNewMessageRequestHelper (client, uniqueId, callback){
         client.get('id', function (err, id) {
