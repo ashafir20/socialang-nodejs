@@ -58,37 +58,40 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
               {
                   if(sender) 
                   {
-                     User.findOne({ "uniqueId" : message.uniqueId }, function (err, reciever)
+                     User.findOne({ "uniqueId" : message.uniqueId }, function (errorUser, reciever)
                      {
                         //update counter for messages collection
-                        Counters.findOneAndUpdate({ name: "messagesCounter" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
+                        if(reciever)
                         {
-                            var newmessage = {
-                                subject : message.subject,
-                                content : message.content,
-                                date : new Date(),
-                                messageId : result.counter,
-                                sender : sender._id
-                            };
+                            Counters.findOneAndUpdate({ name: "messagesCounter" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
+                            {
+                                var newmessage = {
+                                    subject : message.subject,
+                                    content : message.content,
+                                    date : new Date(),
+                                    messageId : result.counter,
+                                    sender : sender._id
+                                };
 
-                            reciever.messages.push(newmessage);
-                            reciever.save(function (errorSaving) {
-                                if(!errorSaving) console.log('saved user with message');
+                                reciever.messages.push(newmessage);
+                                reciever.save(function (errorSaving) {
+                                    if(!errorSaving) console.log('saved user with message');
+                                });
+
+                                jsonResponse = {result : 'OK'};
+                                socket.emit('sendMessageConfirmationResponse', jsonResponse);
+
+                                var allConnectedSockets = io.sockets.clients(); //all connected sockets
+                                for (var i = 0; i < allConnectedSockets.length; i++) {
+                                  sendNewMessageRequestHelper(allConnectedSockets[i], message.uniqueId , function (usersSocket) {
+                                      if(usersSocket) {
+                                          var jsonResponse = { 'result' : "OK", "message" : newmessage, 'senderUser': sender };
+                                          usersSocket.emit('newMessageNotification', jsonResponse);
+                                      }
+                                  });
+                                }
                             });
-
-                            jsonResponse = {result : 'OK'};
-                            socket.emit('sendMessageConfirmationResponse', jsonResponse);
-
-                            var allConnectedSockets = io.sockets.clients(); //all connected sockets
-                            for (var i = 0; i < allConnectedSockets.length; i++) {
-                              sendNewMessageRequestHelper(allConnectedSockets[i], message.uniqueId , function (usersSocket) {
-                                  if(usersSocket) {
-                                      var jsonResponse = { 'result' : "OK", "message" : newmessage, 'senderUser': sender };
-                                      usersSocket.emit('newMessageNotification', jsonResponse);
-                                  }
-                              });
-                            }
-                        });
+                          }
                      });
                   }
               });

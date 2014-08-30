@@ -20,14 +20,42 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 		});
 	});
 
-	socket.on('playerActionNotify', function (data) {
+	socket.on('playerActionNotify', function (data) 
+	{
 		var updatedGame, jsonResponse;
-		socket.get('gameRoomID', function (err, gameRoomID) {
+		socket.get('gameRoomID', function (err, gameRoomID) 
+		{
 			if(err) throw new Error('no game room found');
-			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
+			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) 
+			{
 				if(err) throw new Error('no game room found');
-				GameHelper.SubmitPlayerAnswer(game, data.answer, function (updatedGame) {
-						if(GameHelper.IsAnswerCorrect(updatedGame, data.answer)) {
+				if(data.timerEnd == 'true')
+				{
+					GameHelper.SubmitPlayerTimerEnd(game, function (updatedGame)
+					{
+						var jsonResponse = { result : "OK", answerStatus : "timerEnd" };
+						if(updatedGame.Player1NumOfHearts == 0){
+							jsonResponse.Player1Lost = 'true';
+						} else{
+							jsonResponse.Player1Lost = 'false';
+						}
+						if(updatedGame.Player2NumOfHearts == 0){
+							jsonResponse.Player2Lost = 'true';
+						} else {
+							jsonResponse.Player2Lost = 'false';
+						}
+
+						console.log('updated game after press : ' + updatedGame);
+						//sending only to other player!
+						socket.broadcast.to("HTH" + gameRoomID).emit('playerActionNotifyResponse', jsonResponse);
+					});
+				}
+				else
+				{
+					GameHelper.SubmitPlayerAnswer(game, data.answer, function (updatedGame) 
+					{
+						if(GameHelper.IsAnswerCorrect(updatedGame, data.answer)) 
+						{
 							var jsonResponse = { result : "OK", answerStatus : "Right", playerAnswer : data.answer};
 						} else {
 							var jsonResponse = { result : "OK", answerStatus : "Wrong", playerAnswer : data.answer };
@@ -48,9 +76,10 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 						//sending only to other player!
 						socket.broadcast.to("HTH" + gameRoomID).emit('playerActionNotifyResponse', jsonResponse);
 					});
-				});
+				}
 			});
 		});
+	});
 
 		socket.on('HeadToHeadRematchRequest', function () {
 			socket.get('gameRoomID', function (err, gameRoomID) {

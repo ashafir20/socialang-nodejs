@@ -73,6 +73,25 @@ function HandleCorrectAnswer(game) {
 }
 
 
+exports.SubmitPlayerTimerEnd = function (game, callback) {
+	if(game) {
+		HandleWrongAnswer(game);
+		if(game.CurrentPlayerTurn == 1){
+			game.CurrentPlayerTurn = 2;
+		} else {
+			game.CurrentPlayerTurn = 1;
+		}
+		
+		game.save(function (err) {
+			if(err) throw new Error('error saving game when submitting answer!');
+			console.log('game saved after submitting answer!');
+			callback(game);
+		});
+	} else {
+		console.log('no game entered for SubmitPlayerAnswer');
+	}
+}
+
 exports.SubmitPlayerAnswer = function(game, answer, callback) {
 	if(game) {
 		if(answer === game.LastRound.Answer){

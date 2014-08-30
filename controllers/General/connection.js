@@ -9,7 +9,9 @@ exports.disconnectHandler = function(socket) {
         socket.get('id', function (err, userId) {
         	if(userId) {
         		User.findById(userId, function (error, user){
-        			user.SaveAsConnected(false);
+                    if(user){
+                        user.SaveAsConnected(false);
+                    }
         		});
         	}
         });
