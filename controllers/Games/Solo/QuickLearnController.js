@@ -33,4 +33,15 @@ exports.HandleRoutes = function (socket) {
 			});
 		}
     });
+
+	socket.on('quickLearnGameStartNotify', function (data) {
+		Counters.findOneAndUpdate({ name: "SpeedyGame" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) {
+	        if(result) {
+	        	console.log('updated SpeedyGame counter'.silly);
+	        	console.log('SpeedyGame counter is currently : ' + result.counter);
+			} else{
+				console.log('error updating SpeedyGame counter'.silly);
+			}
+	    });
+    });
 }
