@@ -31,6 +31,9 @@ exports.initialize = function(server) {
         require('./controllers/Games/Social/StudentTeacherGame/StudentTeacherLessonController').StudentTeacherGameHandler(socket, io);
         require('./controllers/Games/Social/MemoryGame/MemoryGamePlay').MemoryGameRoutesHandler(socket, io);
         require('./controllers/Games/Social/GamesListController').WaitingGamesListHandler(socket);
+
+        require('./controllers/Games/Solo/QuickLearnController').HandleRoutes(socket);
+
         require('./controllers/Chat/Chat').ChatHandler(socket, io);
         require('./controllers/General/connection').disconnectHandler(socket);
         require('./controllers/ActivityControllers/CommunityController').CommunityHandler(socket, io);
@@ -48,6 +51,7 @@ exports.initialize = function(server) {
         require('./controllers/General/UserController').HandlerUserDetailsRequests(socket, io);
 
         require('./controllers/Chat/AdvancedChat').HandleAdvancedChat(socket, io);
+
 
     });
 

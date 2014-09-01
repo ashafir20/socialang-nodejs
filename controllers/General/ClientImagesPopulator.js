@@ -83,24 +83,33 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
     });
 
     socket.on('PGImagesRequest', function (data) {
-        console.log('in PGImagesRequest'.green);
+        doOnRequest(data, 'PGImagesResponse');
+    });
+
+    socket.on('QLImagesRequest', function (data) {
+        doOnRequest(data, 'QLImagesResponse');
+    });
+
+
+    function doOnRequest(data, responseKey){
+       console.log('in PGImagesRequest'.green);
         socket.get('id', function (error, userid) {
             if(error) console.log('error getting id from socket'.error);
             else if(userid)  {
                 User.findById(userid, function (errorGettingUser, user) {
                     if(errorGettingUser) console.log('error getting user'.error);
                     else if(user) {
-                       GetRandomizedImages(4, function (results) {
+                       GetRandomizedImages(data.numImages, function (results) {
                           convertWordsToLearningLanguage(user.learningLanguage, results, function (results) {
                             var jsonResult = { result : "OK", images : results };
-                            socket.emit('PGImagesResponse', jsonResult);
+                            socket.emit(responseKey, jsonResult);
                           });
                       });
                     }
                 });
             }
         });
-    });
+    }
     
     socket.on('guestRepoIsFilledAndReady', function (data) {
         console.log('in guestRepoIsFilledAndReady'.green);
