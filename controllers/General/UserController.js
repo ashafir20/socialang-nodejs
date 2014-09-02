@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var User = mongoose.model("User");
 var colors = require("colors");
 var Counters = mongoose.model("Counter");
+var moment = require('moment');
 
 //GetUserDetailsRequest
 //GetUserDetailsResponse
@@ -54,23 +55,27 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
         {
             if(senderid)  
             {
-              User.findById(senderid, function (errorSender, sender) 
+              User.GetFriends(senderid, function (errorSender, sender) 
               {
                   if(sender) 
                   {
-                     User.findOne({ "uniqueId" : message.uniqueId }, function (errorUser, reciever)
+                     User.findOne({ 'uniqueId' : message.uniqueId }, function (errorUser, reciever)
                      {
                         //update counter for messages collection
                         if(reciever)
                         {
                             Counters.findOneAndUpdate({ name: "messagesCounter" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
                             {
+                                var areFriends = checkIfFriends(sender, reciever);
+                                console.log('are friends : ' + areFriends);
+
                                 var newmessage = {
                                     subject : message.subject,
                                     content : message.content,
-                                    date : new Date(),
+                                    date : moment().format("h:mm:ss"),
                                     messageId : result.counter,
-                                    sender : sender._id
+                                    sender : sender._id,
+                                    friends : areFriends
                                 };
 
                                 reciever.messages.push(newmessage);
@@ -121,6 +126,26 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
            }
     }, 10000); //every 10 seconds we refresh the online users
     
+
+
+    function checkIfFriends(user1, user2) {
+        if (!user1.friends || !Array.isArray(user1.friends) || user1.friends.length === 0) {
+          console.log('no friends found'.green);
+          return false;
+        }
+
+        console.log(user1.friends);
+
+        for (var i = 0; i < user1.friends.length; i++) {
+            console.log('printing all friends uniqueid values : '.green);
+            console.log(user1.friends[i].uniqueId);
+            if(user1.friends[i].uniqueId == user2.uniqueId){
+              return true;
+            }
+        }
+
+        return false;
+    }
 
     function sendNewMessageRequestHelper (client, uniqueId, callback){
         client.get('id', function (err, id) {

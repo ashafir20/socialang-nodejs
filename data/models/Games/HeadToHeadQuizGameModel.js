@@ -16,6 +16,7 @@ var HeadToHeadQuizGameSchema = mongoose.Schema ({
         PlayerInviting : mongoose.Schema.Types.ObjectId,
         InviteState : { type: String, default: "NoInvite" },
     },
+    dateCreated : String, //moment date
     LastRound : { 
         Q : String,
         A : [String],

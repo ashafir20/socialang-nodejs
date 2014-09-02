@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var HeadToHeadModel = mongoose.model("HeadToHead");
 var Counters = mongoose.model("Counter");
 var colors = require('colors');
+var moment = require('moment');
 
 exports.LaunchHeadToHeadQuizGame = function (gameRoomID, callback) {
        console.log("Getting game from database by gameRoomID: " + gameRoomID);
@@ -62,7 +63,8 @@ exports.StartHeadToHeadQuizGame = function (player1Id, callback) {
             var headToHeadQuizGame = new HeadToHeadModel({
                 GameState : "Waiting",
                 GameRoomID : result.counter,
-                Player1 : player1Id
+                Player1 : player1Id,
+                dateCreated : Date(),
             });
             console.log("Saving new game : " + headToHeadQuizGame);
             headToHeadQuizGame.save(function (error) {
