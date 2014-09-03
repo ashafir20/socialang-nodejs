@@ -110,7 +110,7 @@ exports.CommunityHandler = function(socket, io) {
 }
 
 function acceptFriendRequest(userId, data, socket) {
-    User.findById(userId, function(errorid, currentUser) {
+/*    User.findById(userId, function(errorid, currentUser) {
         if(!errorid){
             if(data.facebookUser == "true") {
                 User.findOne({ "profileid" : data.profileid }, function (err, user) {
@@ -150,7 +150,7 @@ function acceptFriendRequest(userId, data, socket) {
             }
 
         }
-    });
+    });*/
 }
 
 function ignoreFriendRequest(userId, data, socket) {
@@ -210,7 +210,7 @@ function getFriendsRequestListByUserId(userId, socket) {
 
 
 function putFriendRequestToReciver(userId, data, socket) {
-    User.findById(userId, function(errorid, currentUser) {
+/*    User.findById(userId, function(errorid, currentUser) {
         if(!errorid){
             if(data.facebookUser == "true") {
                 User.findOne({ "profileid" : data.profileid }, function (err, user) {
@@ -249,7 +249,7 @@ function putFriendRequestToReciver(userId, data, socket) {
             }); 
            }
        }
-   });
+   });*/
 }
 
 

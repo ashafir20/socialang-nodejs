@@ -46,6 +46,133 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
 
     
 
+
+    socket.on('friendRequest', function(data) { //FriendShip Request
+        socket.get('id', function (err, userId) {
+            if(userId) {
+                putFriendRequestToReciver(userId, data, socket);
+            }
+        });
+    });
+
+    socket.on('acceptFriendRequest', function(data) {
+        socket.get('id', function (err, userId) {
+            if(userId) {
+                acceptFriendRequest(userId, data.uniqueId , socket);
+            }
+        });
+    });
+
+
+
+function putFriendRequestToReciver(userId, data, socket) {
+    User.findById(userId, function(errorid, currentUser) 
+    {
+        if(errorid) {
+          console.log('error in finding user'.error);
+          throw Error(errorid);
+        }
+        else if(currentUser)
+        {
+            User.findOne({ "uniqueId" : data.uniqueId }, function (err, reciever) {
+              if(err) {
+                console.log('error in finding friend'.error);
+                throw Error(err);
+              }
+              else if(reciever) {
+                    reciever.friendsRequests.addToSet(currentUser._id); //Unique Adding
+                    reciever.save(function(error) {
+                        if(error) {
+                            jsonResponse = {result : 'Failed'};
+                            socket.emit('friendRequestRespone', jsonResponse);
+                            throw Error(error);
+                        }
+                        else {
+                            console.log('Friend Request Was Recived And Updated In The Reciver'.green);
+                            jsonResponse = {result : 'OK'};
+                            socket.emit('friendRequestRespone', jsonResponse);
+
+
+                            trySendNotificationIfConnected(currentUser, reciever.uniqueId, trySendNewFriendRequestHelper);
+
+                        }
+                    });
+                }
+            });
+        }
+   });
+}
+
+
+    function trySendNewFriendRequestHelper(client, recieversUniqueId, sender){
+      client.get('id', function (err, id) {
+          if(id) {
+            console.log('trying to find user with id: ' + id + "".silly);
+            User.findById(id, function (error, user) {
+                if(user && user.uniqueId == Number(recieversUniqueId)) {
+                    console.log('found the online reciever! lets send him a friend request notification');
+                    var jsonResponse = { 'result' : "OK", 'sender': sender };
+                    client.emit('newFriendRequestNotification', jsonResponse);
+                } 
+            });
+          }
+        });
+    }
+
+
+
+   function tryFriendRequestAprrovalHelper(client, requesterUniqueId, approver){
+       client.get('id', function (err, id) {
+          if(id) {
+            console.log('trying to find user with id: ' + id + "".silly);
+            User.findById(id, function (error, user) {
+                if(user && user.uniqueId == Number(requesterUniqueId)) {
+                    console.log('found the online friend requester! lets send him a friend request approval notification');
+                    var jsonResponse = { 'result' : "OK", 'approver': approver };
+                    client.emit('friendRequestAccepted', jsonResponse);
+                } 
+            });
+          }
+        });
+   }
+
+    function trySendNotificationIfConnected(sender, recieversUniqueId, func){
+          var allConnectedSockets = io.sockets.clients(); //all connected sockets
+          for (var i = 0; i < allConnectedSockets.length; i++) {
+              func(allConnectedSockets[i], recieversUniqueId, sender);
+          }
+    }
+
+
+   function acceptFriendRequest(userId, uniqueId, socket) {
+      User.findById(userId, function(errorid, currentUser) {
+          if(currentUser){
+              User.findOne({ "uniqueId" : uniqueId }, function (err, requester) {
+                  if(requester) {
+                        currentUser.friends.addToSet(requester._id);
+                        currentUser.friendsRequests.remove(requester._id);
+                        currentUser.save(function(errorSaving) {
+                            if(!errorSaving) console.log('saved approver with a new friend');
+                        });
+                        requester.friends.addToSet(currentUser._id);
+                        requester.save(function(errorSaving) {
+                            if(!errorSaving) console.log('saved requester with a new friend');
+                        });
+
+                        //to the user that approved
+                        jsonResponse = {result : 'OK'};
+                        socket.emit('acceptFriendRequestRespone', jsonResponse);
+
+                         //to the user that sent the request
+                        trySendNotificationIfConnected(currentUser, requester.uniqueId, tryFriendRequestAprrovalHelper);
+                    }
+                });
+              }
+      });
+    }
+
+
+
     //catching the same emit key as community controller -> community only saves message to reciever user document
     //this function is for online messaging
     socket.on('sendNewMessageRequest', function (message) 
