@@ -22,6 +22,7 @@ var UserSchema = mongoose.Schema({
         level: { type: String, enum: Levels }
      }],
     messages    : [{
+        newMessage : { type: Boolean, default: true },
         subject : String,
         content : String,
         date : Date,

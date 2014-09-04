@@ -5,6 +5,20 @@ var Counters = mongoose.model("Counter");
 
 exports.CommunityHandler = function(socket, io) {
 
+    socket.on('messageWasRead', function (data) {   //Get The Users Friends List
+        console.log('in messageWasRead'.green);
+        console.log(data);
+        var messageId = data.messageId;
+        socket.get('id', function (err, userId) {
+            if(userId) {
+                User.GetMessages(userId, function (errorid, user) {
+                   console.log(user);
+                });
+            }
+        });
+    });
+
+
     socket.on('friendsRequest', function () {   //Get The Users Friends List
         socket.get('id', function (err, userId) {
             if(userId) {
