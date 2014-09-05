@@ -83,15 +83,14 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
     });
 
     socket.on('PGImagesRequest', function (data) {
-        doOnRequest(data, 'PGImagesResponse');
+        doOnPGIRequest(data, 'PGImagesResponse');
     });
 
     socket.on('QLImagesRequest', function (data) {
-        doOnRequest(data, 'QLImagesResponse');
+        doOnQLRequest(data, 'QLImagesResponse');
     });
 
-
-    function doOnRequest(data, responseKey){
+    function doOnQLRequest(data, responseKey){
        console.log('in PGImagesRequest'.green);
         socket.get('id', function (error, userid) {
             if(error) console.log('error getting id from socket'.error);
@@ -99,6 +98,30 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
                 User.findById(userid, function (errorGettingUser, user) {
                     if(errorGettingUser) console.log('error getting user'.error);
                     else if(user) {
+                      console.log('-------------------------------'.green);
+                       console.log(data.language);
+                       GetRandomizedImages(data.numImages, function (results) {
+                          convertWordsToLearningLanguage(data.language, results, function (results) {
+                            var jsonResult = { result : "OK", images : results , language : data.language };
+                            socket.emit(responseKey, jsonResult);
+                          });
+                      });
+                    }
+                });
+            }
+        });
+    }
+
+    function doOnPGIRequest(data, responseKey){
+       console.log('in PGImagesRequest'.green);
+        socket.get('id', function (error, userid) {
+            if(error) console.log('error getting id from socket'.error);
+            else if(userid)  {
+                User.findById(userid, function (errorGettingUser, user) {
+                    if(errorGettingUser) console.log('error getting user'.error);
+                    else if(user) {
+                      console.log('-------------------------------'.green);
+                       console.log(user.learningLanguage);
                        GetRandomizedImages(data.numImages, function (results) {
                           convertWordsToLearningLanguage(user.learningLanguage, results, function (results) {
                             var jsonResult = { result : "OK", images : results };

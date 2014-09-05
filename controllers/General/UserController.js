@@ -16,14 +16,21 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
         if(uniqueid == null || uniqueid == 'undefined') {
             jsonResponse = { 'result' : 'Failed' };
             socket.emit('GetUserDetailsResponse', jsonResponse);
-        } else {
-             User.findOne({ 'uniqueId': Number(uniqueid) }, function (err, user) {
-                  if (err) console.log('could not find user in collection!'.error);
-                  else if(user) {
-                     jsonResponse = { 'result' : 'OK', 'user' : user };
-                     socket.emit('GetUserDetailsResponse', jsonResponse);
-                  }
-             });
+        } 
+        else 
+        {
+          socket.get('id', function (errorid, currUser) {
+            if(currUser){
+               User.findOne({ 'uniqueId': Number(uniqueid) }, function (err, user) {
+                    if (err) console.log('could not find user in collection!'.error);
+                    else if(user) {
+                       var areFriends = checkIfFriends(currUser, user);
+                       jsonResponse = { 'result' : 'OK', 'user' : user, 'areFriends' : areFriends };
+                       socket.emit('GetUserDetailsResponse', jsonResponse);
+                    }
+               });
+            }
+          });
         }
     });
 
@@ -194,20 +201,30 @@ function putFriendRequestToReciver(userId, data, socket) {
                             Counters.findOneAndUpdate({ name: "messagesCounter" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
                             {
                                 var areFriends = checkIfFriends(sender, reciever);
+
+                                console.log('---------------------------'.green);
                                 console.log('are friends : ' + areFriends);
+                                console.log('message counter : ' + result.counter);
 
                                 var newmessage = {
                                     subject : message.subject,
                                     content : message.content,
-                                    date : moment().format("h:mm:ss"),
+                                    date : new Date(),
                                     messageId : result.counter,
                                     sender : sender._id,
                                     friends : areFriends
                                 };
 
                                 reciever.messages.push(newmessage);
-                                reciever.save(function (errorSaving) {
-                                    if(!errorSaving) console.log('saved user with message');
+                                reciever.save(function (errorSaving, newmessage) {
+                                    if(errorSaving) {
+                                      console.log('---------------------------'.error);
+                                      console.log('error saving new message to reciever'.error);
+                                    }
+                                    else {
+                                      console.log('saved user with a new message'.green);
+                                      console.log(newmessage);
+                                    }
                                 });
 
                                 jsonResponse = {result : 'OK'};
@@ -217,6 +234,7 @@ function putFriendRequestToReciver(userId, data, socket) {
                                 for (var i = 0; i < allConnectedSockets.length; i++) {
                                   sendNewMessageRequestHelper(allConnectedSockets[i], message.uniqueId , function (usersSocket) {
                                       if(usersSocket) {
+                                          newmessage.date = moment().format("h:mm:ss");
                                           var jsonResponse = { 'result' : "OK", "message" : newmessage, 'senderUser': sender };
                                           usersSocket.emit('newMessageNotification', jsonResponse);
                                       }

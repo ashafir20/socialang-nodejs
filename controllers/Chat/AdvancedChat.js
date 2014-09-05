@@ -226,7 +226,8 @@ exports.HandleAdvancedChat = function (socket, io) {
         			 'learningLanguage' : user.learningLanguage,
         			 'firstName' :  user.firstName,
         			 'lastName' :  user.lastName,
-        			 'profileid' : user.profileid 
+        			 'profileid' : user.profileid,
+        			 'uniqueId' : user.uniqueId
         			};
 
         			callback(result);

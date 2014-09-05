@@ -7,7 +7,7 @@ var colors = require("colors");
 var moment = require('moment');
 
 exports.CleanGames = function () {
-    console.log('inside CleanAbandonedGamesHandler');
+   // console.log('inside CleanAbandonedGamesHandler');
 
     var minutes = 1, the_interval = minutes * 60 * 1000; // 60 seconds interval
 
