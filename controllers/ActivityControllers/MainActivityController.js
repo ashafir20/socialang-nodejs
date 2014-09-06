@@ -87,11 +87,13 @@ exports.HomeActivityHandler = function(socket) {
                         jsonResponse = { result : "Failed" };
                         socket.emit("ProfileDetailsResponse", jsonResponse);
                     }
-                    else {
+                    else 
+                    {
 
                         var nextLevel = getNextLevel(user.learningLanguage , user.stats);
                         var currPoints = getCurrentLanguagePoints(user.learningLanguage , user.stats);
                         var pointsTilNextLevel = LevelPointsMap[nextLevel] - currPoints;
+
 
                         jsonResponse =  { 
                                     result : "OK",

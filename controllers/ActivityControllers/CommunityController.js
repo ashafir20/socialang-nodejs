@@ -68,13 +68,6 @@ exports.CommunityHandler = function(socket, io) {
         });
     });
 
-    socket.on('onlineUsersRequest', function() {
-        socket.get('id', function (err, userId) {
-            if(userId) {
-                getOnlineUsers(io, userId, socket);
-            }
-        });
-    });
 
     socket.on('friendRequest', function(data) { //FriendShip Request
         socket.get('id', function (err, userId) {
@@ -121,7 +114,51 @@ exports.CommunityHandler = function(socket, io) {
         console.log("Recives Message: " + data.message);
         io.sockets.in("communitychat").emit("newCommunityChatMessage", data);
     });
+
+
+    socket.on('onlineUsersRequest', function() {
+        socket.get('id', function (err, userId) {
+            if(userId) {
+                getOnlineUsers(io, function (onlineUsers) {
+                    var jsonResponse = { 'result' : 'OK', 'onlineUsersArray' : onlineUsers };
+                    socket.emit('onlineUsersResponse', jsonResponse);
+                });
+            }
+        });
+    });
 }
+
+
+
+
+function getOnlineUsers(io, callback) {
+    var onlineUsers = [];
+    console.log('in getOnlineUsers');
+    var inserted = 0;
+    var clients = io.sockets.clients(); //all connected clients
+    for (var i = 0; i < clients.length; i++) 
+    {
+        console.log(clients[i].id);
+        clients[i].get('id', function (err, userid)
+        {
+            if(userid)
+            {
+                User.findById(userid, function (error, user) 
+                {
+                    if(user) 
+                    {
+                        onlineUsers.push(user);
+                        if(++inserted == clients.length)
+                        {
+                            callback(onlineUsers);
+                        }
+                    }
+                });
+            }
+        });
+    }
+}
+
 
 function acceptFriendRequest(userId, data, socket) {
 /*    User.findById(userId, function(errorid, currentUser) {
@@ -266,36 +303,6 @@ function putFriendRequestToReciver(userId, data, socket) {
    });*/
 }
 
-
-
-function getOnlineUsers(io, userId, socket) {
-    var onlineUsers = [];
-    console.log('in getOnlineUsers');
-    var inserted = 0;
-    var clients = io.sockets.clients(); //all connected clients
-    for (var i = 0; i < clients.length; i++) 
-    {
-        console.log(clients[i].id);
-        clients[i].get('id', function (err, userid)
-        {
-            if(userid)
-            {
-                User.findById(userid, function (error, user) 
-                {
-                    if(user) 
-                    {
-                        onlineUsers.push(user);
-                        if(++inserted == clients.length)
-                        {
-                            var jsonResponse = { 'result' : 'OK', 'onlineUsersArray' : onlineUsers };
-                            socket.emit('onlineUsersResponse', jsonResponse);
-                        }
-                    }
-                });
-            }
-        });
-    }
-
 /*    User.find({ "online" : true}, function (err, usersOnlineArray) {
         if(usersOnlineArray) {
             jsonResponse = {result : 'OK', onlineUsersArray : usersOnlineArray};
@@ -303,7 +310,7 @@ function getOnlineUsers(io, userId, socket) {
         }
     });*/
         
-}
+//}
 
 function findIfFriends(userId, data, socket) {
     var isFriends = false;

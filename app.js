@@ -21,7 +21,6 @@ var app = express();
 var osipaddress = process.env.OPENSHIFT_NODEJS_IP;
 var osport = process.env.OPENSHIFT_NODEJS_PORT;
 
-
 var app = express();
 var osipaddress = process.env.OPENSHIFT_NODEJS_IP;
 var osport = process.env.OPENSHIFT_NODEJS_PORT;
@@ -50,5 +49,11 @@ server.listen(app.get('port'), app.get('ipaddress'), function(){
 
 //SOCKET.IO INITIALIZE
 var router = require('./router.js');
-router.initialize(server);
+try{
+    router.initialize(server);
+} catch(ex){
+    console.log('in main catch');
+    console.log(ex);
+}
+
 

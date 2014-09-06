@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var googleTranslate = require('google-translate')('AIzaSyCMgsE-JKzD6YnXen2sEEeoT6OxteRgj24');
 var HeadToHeadModel = mongoose.model("HeadToHead");
+var colors = require('colors');
 
 /*        languagesToLocalMap.put("Spanish", "es");
         languagesToLocalMap.put("Hebrew", "he");
@@ -17,7 +18,9 @@ exports.GetNextRound = function (game, locale, callback){
 		console.log(words);
 		var round = { Answer :  words[0] };
 		googleTranslate.translate(words[0], locale , function (err, translation) {
-			if(err) throw new Error("error in word translate");
+			if(err) {
+				console.log("error in word translate".error);
+			}
 			var question = translation.translatedText;
 			console.log('Question : ' + question);
 			round.Q = question;
@@ -26,7 +29,9 @@ exports.GetNextRound = function (game, locale, callback){
 			round.A = shuffledWords;
 			game.LastRound = round;
 			game.save(function (errSaving){
-				if(errSaving) if(err) throw new Error('error saving game when getting next round');
+				if(errSaving) if(err) {
+					console.log('error saving game when getting next round'.error);
+				}
 				callback(game.LastRound);
 			});
 		});	
@@ -83,7 +88,9 @@ exports.SubmitPlayerTimerEnd = function (game, callback) {
 		}
 		
 		game.save(function (err) {
-			if(err) throw new Error('error saving game when submitting answer!');
+			if(err) {
+				console.log('error saving game when submitting answer!'.error);
+			}
 			console.log('game saved after submitting answer!');
 			callback(game);
 		});
@@ -93,7 +100,8 @@ exports.SubmitPlayerTimerEnd = function (game, callback) {
 }
 
 exports.SubmitPlayerAnswer = function(game, answer, callback) {
-	if(game) {
+	if(game) 
+	{
 		if(answer === game.LastRound.Answer){
 			HandleCorrectAnswer(game);
 		} else {
@@ -107,11 +115,15 @@ exports.SubmitPlayerAnswer = function(game, answer, callback) {
 		}
 		
 		game.save(function (err) {
-			if(err) throw new Error('error saving game when submitting answer!');
+			if(err) {
+				console.log('error saving game when submitting answer!'.error);
+			}
 			console.log('game saved after submitting answer!');
 			callback(game);
 		});
-	} else {
+	} 
+	else
+	{
 		console.log('no game entered for SubmitPlayerAnswer');
 	}
 }

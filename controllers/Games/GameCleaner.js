@@ -9,13 +9,13 @@ var moment = require('moment');
 exports.CleanGames = function () {
    // console.log('inside CleanAbandonedGamesHandler');
 
-    var minutes = 1, the_interval = minutes * 60 * 1000; // 60 seconds interval
+    var minutes = 5, the_interval = minutes * 60 * 1000 * 5; // 5 minutes interval
 
     //test
     //var minutes = 1, the_interval = minutes * 10 * 1000;
 
     //lets remove games
-    setInterval(function() {
+/*    setInterval(function() {
           console.log('cleaning abandoned games'.green);
           HeadToHeadModel.find({}, { dateCreated: 1, GameRoomID: 1, _id: 0 }, function  (err, docs) {
                if (err) return console.log(err);
@@ -39,7 +39,7 @@ exports.CleanGames = function () {
                   var maxDelta = 50 * 60 //5 minute (300 seconds) max per game
                   console.log('the delta is set at: ' + maxDelta + " seconds");
 
-                    if(Math.abs(nowTime - diffFromNow) > maxDelta) {
+                    if(Math.abs(diffFromNow) > maxDelta) {
                         console.log('found an abandoned! removing it...'.green);
                         console.log('GameRoomID is : ' + doc.GameRoomID);
                           HeadToHeadModel.remove({ 'GameRoomID' : doc.GameRoomID }, function (error) {
@@ -52,7 +52,9 @@ exports.CleanGames = function () {
                     }
                 });
           });
-    }, the_interval ); //1 minute
+    }, the_interval);
+
+    */ //1 minute
 
     //on server restart remove all playing games...
 /*    mongoose.connection.db.dropCollection("headtoheads", function(err, result) {

@@ -7,15 +7,23 @@ var GameHelper  = require('./HeadToHeadQuizGameHelper');
 
 exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 
-	socket.on('roundRequest', function () {
+	socket.on('roundRequest', function ()
+	{
 		socket.get('gameRoomID', function (err, gameRoomID) {
 			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
-				if(err) throw new Error('no game room found');
-				var locale = Dictionary.GetLanguageLocale(game.Player1.learningLanguage);
-				GameHelper.GetNextRound(game, locale, function (headToHeadRound) {
-					var jsonResponse = { result : "OK" , round : headToHeadRound };
-					io.sockets.in("HTH" + gameRoomID).emit('roundResponse', jsonResponse);
-				});
+				if(err) {
+					console.log('no game room found in socket'.error);
+				}
+				else if(game){
+					console.log(game);
+					var locale = Dictionary.GetLanguageLocale(game.Player1.learningLanguage);
+					GameHelper.GetNextRound(game, locale, function (headToHeadRound) {
+						var jsonResponse = { result : "OK" , round : headToHeadRound };
+						io.sockets.in("HTH" + gameRoomID).emit('roundResponse', jsonResponse);
+					});
+				} else {
+					console.log('error finding game in h2h roundRequest'.error);
+				}
 			});
 		});
 	});
@@ -25,11 +33,24 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 		var updatedGame, jsonResponse;
 		socket.get('gameRoomID', function (err, gameRoomID) 
 		{
-			if(err) throw new Error('no game room found');
-			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) 
+			if(err) {
+				console.log('no game room found'.error);
+			}
+			else
 			{
-				if(err) throw new Error('no game room found');
-				if(data.timerEnd == 'true')
+				playerActionNotifyHelper(gameRoomID, data);
+			}
+		});
+	});
+
+	function playerActionNotifyHelper(gameRoomID, data)
+	{
+		HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) 
+		{
+				if(error) {
+					console.log('no game room found in collection'.error);
+				}
+				else if(data.timerEnd == 'true')
 				{
 					GameHelper.SubmitPlayerTimerEnd(game, function (updatedGame)
 					{
@@ -78,65 +99,83 @@ exports.HeadToHeadQuizGameRoutesHandler = function (socket, io) {
 					});
 				}
 			});
+	}
+
+
+
+	socket.on('HeadToHeadRematchRequest', function () {
+		socket.get('gameRoomID', function (err, gameRoomID) {
+			if(err) {
+				console.log('no game room found'.error);
+			}
+			else {
+				HeadToHeadRematchRequestHelper(gameRoomID);
+			}
 		});
 	});
 
-		socket.on('HeadToHeadRematchRequest', function () {
-			socket.get('gameRoomID', function (err, gameRoomID) {
-				if(err) throw new Error('no game room found');
-				HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
-					if(err) throw new Error('no game room found');
-					socket.get('id', function (errorId, id) {
-						if(errorId) console.log('couldnt find userid in MemoryGameRematchRequest'.error);
-						else if(id)
+	function HeadToHeadRematchRequestHelper(gameRoomID) {
+		HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) 
+		{
+			if(error) {
+				console.log('no game room found'.error);
+			}
+			else
+			{
+				socket.get('id', function (errorId, id) {
+					if(errorId) console.log('couldnt find userid in MemoryGameRematchRequest'.error);
+					else if(id)
+					{
+						if(game.RematchDetails.InviteState == "NoInvite") 
 						{
-							if(game.RematchDetails.InviteState == "NoInvite") 
-							{
-								game.RematchDetails.InviteState = "RematchRequested";
-								game.RematchDetails.PlayerInviting = id;
-								game.save(function  (error) {
-									if(!error) console.log('game was saved! with a new rematch invite'.silly);
-								});
-							} 
-							else if(game.RematchDetails.InviteState == "RematchRequested") 
-							{
-								var jsonResponse = { result : "OK", rematch : "RematchAccepted" };
-								io.sockets.in("HTH" + gameRoomID).emit('HeadToHeadRematchResponse', jsonResponse);
-								game.RematchDetails.InviteState = "NoInvite";
+							game.RematchDetails.InviteState = "RematchRequested";
+							game.RematchDetails.PlayerInviting = id;
+							game.save(function  (error) {
+								if(!error) console.log('game was saved! with a new rematch invite'.silly);
+							});
+						} 
+						else if(game.RematchDetails.InviteState == "RematchRequested") 
+						{
+							var jsonResponse = { result : "OK", rematch : "RematchAccepted" };
+							io.sockets.in("HTH" + gameRoomID).emit('HeadToHeadRematchResponse', jsonResponse);
+							game.RematchDetails.InviteState = "NoInvite";
 
-								game.Player1NumOfHearts = 5;
-								game.Player2NumOfHearts = 5;
-								game.CurrentPlayerTurn = 1;
+							game.Player1NumOfHearts = 5;
+							game.Player2NumOfHearts = 5;
+							game.CurrentPlayerTurn = 1;
 
-								game.save(function  (error) {
-									if(!error) {
-										console.log('game was saved! '.silly);
-									}
-								});
-							} 
-/*							else if(game.RematchDetails.InviteState == 'RematchDeclined')
-							{
-								var jsonResponse = { result : "OK" , rematch : "RematchDeclined" };
-								socket.emit('HeadToHeadRematchResponse', jsonResponse);
-							}*/
-						}
-					});
+							game.save(function  (error) {
+								if(!error) {
+									console.log('game was saved! '.silly);
+								}
+							});
+						} 
+					}
 				});
+			}
 		});
-	});
+	}
 
 	socket.on('HeadToHeadRematchDeniedNotify', function () {
 		socket.get('gameRoomID', function (err, gameRoomID) {
-			if(err) throw new Error('no game room found');
-			HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
-				if(err) throw new Error('no game room found');
-				game.RematchDetails.InviteState == "RematchDeclined" 
-				game.save(function  (error) {
-					if(!error) {
-						console.log('game was saved! '.silly);
+			if(err) {
+				console.log('no game room found');
+			}
+			else
+			{
+				HeadToHeadModel.findByGameRoomID(gameRoomID, function (error, game) {
+					if(error) console.log('no game room found');
+					else
+					{
+						game.RematchDetails.InviteState == "RematchDeclined" 
+						game.save(function  (error) {
+							if(!error) {
+								console.log('game was saved! '.silly);
+							}
+						});
 					}
 				});
-			});
+			}
 		});
 	});
 }

@@ -91,7 +91,7 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
     });
 
     function doOnQLRequest(data, responseKey){
-       console.log('in PGImagesRequest'.green);
+       console.log('in QLImagesRequest'.green);
         socket.get('id', function (error, userid) {
             if(error) console.log('error getting id from socket'.error);
             else if(userid)  {

@@ -77,14 +77,14 @@ function putFriendRequestToReciver(userId, data, socket) {
     {
         if(errorid) {
           console.log('error in finding user'.error);
-          throw Error(errorid);
+          console.log(errorid);
         }
         else if(currentUser)
         {
             User.findOne({ "uniqueId" : data.uniqueId }, function (err, reciever) {
               if(err) {
                 console.log('error in finding friend'.error);
-                throw Error(err);
+                console.log(err);
               }
               else if(reciever) {
                     reciever.friendsRequests.addToSet(currentUser._id); //Unique Adding
@@ -92,7 +92,7 @@ function putFriendRequestToReciver(userId, data, socket) {
                         if(error) {
                             jsonResponse = {result : 'Failed'};
                             socket.emit('friendRequestRespone', jsonResponse);
-                            throw Error(error);
+                            console.log(error);
                         }
                         else {
                             console.log('Friend Request Was Recived And Updated In The Reciver'.green);
@@ -249,6 +249,7 @@ function putFriendRequestToReciver(userId, data, socket) {
           });
       });  
 
+    //for updating online status of connected users
     setInterval(function()
     {
           var clients = io.sockets.clients(); //all connected sockets
