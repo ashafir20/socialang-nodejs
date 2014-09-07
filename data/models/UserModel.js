@@ -65,6 +65,12 @@ UserSchema.statics.GetUserFull = function(userId, callback) {
         .exec(callback);
 }
 
+UserSchema.statics.GetUserFullByUniqueId = function(uniqueId, callback) {
+    this.findOne({ 'uniqueId' : uniqueId })
+        .populate('friends')
+        .populate('messages.sender')
+        .exec(callback);
+}
 
 UserSchema.statics.GetFriendsRequestsList = function(userId, callback) {
     this.findById(userId)

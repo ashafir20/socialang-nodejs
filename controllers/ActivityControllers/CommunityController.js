@@ -206,34 +206,18 @@ function acceptFriendRequest(userId, data, socket) {
 
 function ignoreFriendRequest(userId, data, socket) {
     User.findById(userId, function(errorid, currentUser) {
-        if(!errorid){
-            if(data.facebookUser == "true") {
-                User.findOne({ "profileid" : data.profileid }, function (err, user) {
-
-                    if(user) {
-                        currentUser.friendsRequests.remove(user._id);
-                        currentUser.save(function(errorSaving) {
-                            //error Handling 
-                        });
-                        jsonResponse = {result : 'OK'};
-                        socket.emit('ignoreFriendRespone', jsonResponse);
-                    }
-                });
-            }
-            else {
-                User.findOne({ "username" : data.username }, function (err, user) {
-
-                    if(user) {
-                        currentUser.friendsRequests.remove(user._id);
-                        currentUser.save(function(errorSaving) {
-                            //error Handling 
-                        });
-                        jsonResponse = {result : 'OK'};
-                        socket.emit('ignoreFriendRespone', jsonResponse);
-                    }
-                });
-            }
-
+        if(currentUser)
+        {
+            User.findOne({ "uniqueId" : data.uniqueId }, function (err, user) {
+                if(user) {
+                    currentUser.friendsRequests.remove(user._id);
+                    currentUser.save(function(errorSaving) {
+                        //error Handling 
+                    });
+                    jsonResponse = {result : 'OK'};
+                    socket.emit('ignoreFriendRespone', jsonResponse);
+                }
+            });
         }
     });
 }
@@ -423,41 +407,20 @@ function deleteFriend(userId, data, socket){
     var userToDeleteID;
     User.findById(userId, function(errorid, currentUser) {
         if(!errorid){
-            if(data.facebookUser == "true") {
-                User.findOne({ "profileid" : data.profileid }, function (err, user) {
-
-                    if(user) {
-                        currentUser.friends.remove(user._id);
-                        currentUser.save(function(errorSaving) {
-                            //error Handling 
-                        });
-                        user.friends.remove(currentUser._id);
-                        user.save(function(errorSaving) {
-                            //error Handling 
-                        });
-                        jsonResponse = {result : 'OK'};
-                        socket.emit('unfriendResponse', jsonResponse);
-                    }
-                });
-            }
-            else {
-                User.findOne({ "username" : data.username }, function (err, user) {
-
-                    if(user) {
-                        currentUser.friends.remove(user._id);
-                        currentUser.save(function(errorSaving) {
-                            //error Handling 
-                        });
-                        user.friends.remove(currentUser._id);
-                        user.save(function(errorSaving) {
-                            //error Handling 
-                        });
-                        jsonResponse = {result : 'OK'};
-                        socket.emit('unfriendResponse', jsonResponse);
-                    }
-                });
-            }
-
+            User.findOne({ "uniqueId" : data.uniqueId }, function (err, user) {
+                if(user) {
+                    currentUser.friends.remove(user._id);
+                    currentUser.save(function(errorSaving) {
+                        //error Handling 
+                    });
+                    user.friends.remove(currentUser._id);
+                    user.save(function(errorSaving) {
+                        //error Handling 
+                    });
+                    jsonResponse = {result : 'OK', uniqueId : data.uniqueId };
+                    socket.emit('unfriendResponse', jsonResponse);
+                }
+            });
         }
     });
 }

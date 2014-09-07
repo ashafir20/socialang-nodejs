@@ -45,42 +45,73 @@ exports.HandleClientImageCachingRequests = function (socket, io) {
     	console.log('in MGImagesRequest'.green);
     	//calling from client room activity
     	getVariableFromSocket(socket, 'gameRoomID', function (gameRoomID) {
-    		if(gameRoomID) {
-    			MemoryGameModel.findByGameRoomID(gameRoomID, function (err, game) {
-                    if(err) throw new Error('game was not found!');
-    				else if(!err) console.log('game was found'.green);
-    				if(data.isHost == 'true') 
+    		if(gameRoomID) 
+            {
+    			MemoryGameModel.findByGameRoomID(gameRoomID, function (err, game) 
+                {
+                    if(err){
+                       console.log('game was not found!');  
+                    }
+    				else if(!err)
                     {
-    					console.log('user is host'.green);
-    					GetRandomizedImages(8, function (results) {
-                            SaveImagesToGameDocument(results, game);
-                            convertWordsToLearningLanguage(game.Player1.learningLanguage, results, function (results) {
-                                var jsonResult = { result : "OK", images : results };
-                                socket.emit('MGImagesResponse', jsonResult);
-                            });
-                            //clear images from document
-                        });
-    				} 
-                    else 
-                    {
-    					console.log('user is guest'.green);
-    					GetImages(game, function (results) {
-                            if(results != null){
-                                var learningLanguage = game.Player1.learningLanguage;
-                                convertWordsToLearningLanguage(learningLanguage, results, function (results) {
-                                    var jsonResult = { result : "OK", images : results };
-                                    socket.emit('MGImagesResponse', jsonResult);
-                                });
-                            } else {
-                               var jsonResult = { result : "Failed", "Message" : 'TryAgain' };
-                               socket.emit('MGImagesResponse', jsonResult);
-                            }
-                        });
-    				}
-    			});
+                        console.log('game was found'.green);
+                        MGImagesRequestHelper(data, socket, game);
+                    }
+                });
     		}
     	});
     });
+
+    function MGImagesRequestHelper(data, socket, game)
+    {
+        if(data.isHost == 'true') 
+        {
+            console.log('user is host'.green);
+            GetRandomizedImages(8, function (results) {
+                SaveImagesToGameDocument(results, game);
+                convertWordsToLearningLanguage(game.Player1.learningLanguage, results, function (results) {
+                    var jsonResult = { result : "OK", images : results };
+                    socket.emit('MGImagesResponse', jsonResult);
+                });
+                //clear images from document
+            });
+        } 
+        else if(data.isHost == 'false')
+        {
+            console.log('user is guest'.green);
+            GetImages(game, function (results)
+            {
+                if(results != null)
+                {
+                    var learningLanguage = game.Player1.learningLanguage;
+                    convertWordsToLearningLanguage(learningLanguage, results, function (results) {
+                        var jsonResult = { result : "OK", images : results };
+                        socket.emit('MGImagesResponse', jsonResult);
+                    });
+                }
+                else
+                {
+                   var jsonResult = { result : "Failed", "Message" : 'TryAgain' };
+                   socket.emit('MGImagesResponse', jsonResult);
+                }
+
+
+                    game.ImagesFilenames = []; 
+                     //clear the images filenames array after guest already toke them
+                    game.save(function (err, game) {
+                        if(err) {
+                            console.log('game wasnt saved! MGImagesRequest after guest got images'.error);
+                        }
+                        else {
+                            console.log('game saved!'.green);
+                        }
+                    });
+            });
+        }
+    }
+
+
+
 
     socket.on('PGImagesRequest', function (data) {
         doOnPGIRequest(data, 'PGImagesResponse');
@@ -230,7 +261,8 @@ function translateWord(wordToTranslate, locale, callback) {
 function GetImages(game, callback) {
 	console.log('in sendToGuestExistingImages'.green);
     var conn = mongoose.createConnection(dburl);
-    conn.once('open', function () {
+    conn.once('open', function ()
+    {
         var gfs = Grid(conn.db);
         //stream from gridfs the game.ImagesFilenames
         var results = [];
@@ -290,7 +322,7 @@ function SaveImagesToGameDocument(results, game) {
         else {
             console.log('game could not be saved after inserting images'.error);
         }
-	})
+	});
 }
 
 

@@ -7,7 +7,29 @@ var moment = require('moment');
 //GetUserDetailsRequest
 //GetUserDetailsResponse
 
+
+
 exports.HandlerUserDetailsRequests = function (socket, io) {
+
+    function checkIfFriends(user1, user2uniqueId) {
+        if (!user1.friends || user1.friends.length == 0) {
+          console.log('no friends found'.green);
+          return false;
+        }
+
+        console.log(user1.friends);
+
+        for (var i = 0; i < user1.friends.length; i++) {
+            console.log('printing all friends uniqueid values : '.green);
+            console.log(user1.friends[i].uniqueId);
+            if(user1.friends[i].uniqueId == user2uniqueId){
+              return true;
+            }
+        }
+
+        return false;
+    }
+
     socket.on('GetUserDetailsRequest', function (data) {
         var uniqueid = data.UserUniqueId;
         console.log('in GetUserDetailsRequest');
@@ -19,17 +41,20 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
         } 
         else 
         {
-          socket.get('id', function (errorid, currUser) {
-            if(currUser){
-               User.findOne({ 'uniqueId': Number(uniqueid) }, function (err, user) {
-                    if (err) console.log('could not find user in collection!'.error);
-                    else if(user) {
-                       var areFriends = checkIfFriends(currUser, user);
-                       jsonResponse = { 'result' : 'OK', 'user' : user, 'areFriends' : areFriends };
-                       socket.emit('GetUserDetailsResponse', jsonResponse);
-                    }
+          socket.get('id', function (errorId, currentUserId) {
+             User.findOne({ 'uniqueId' : uniqueid }, function (errorid, otherUser) {
+              if(otherUser) {
+                 User.GetUserFull(currentUserId, function (err, currentUser) {
+                      if (err) console.log('could not find user in collection!'.error);
+                      else if(currentUser) {
+                         console.log(currentUser);
+                         var areFriends = checkIfFriends(currentUser, uniqueid);
+                         jsonResponse = { 'result' : 'OK', 'user' : otherUser, 'areFriends' : areFriends };
+                         socket.emit('GetUserDetailsResponse', jsonResponse);
+                      }
+                    });   
+                  }
                });
-            }
           });
         }
     });
@@ -52,8 +77,6 @@ exports.HandlerUserDetailsRequests = function (socket, io) {
     });
 
     
-
-
     socket.on('friendRequest', function(data) { //FriendShip Request
         socket.get('id', function (err, userId) {
             if(userId) {
@@ -152,6 +175,7 @@ function putFriendRequestToReciver(userId, data, socket) {
 
 
    function acceptFriendRequest(userId, uniqueId, socket) {
+      console.log('in acceptFriendRequest');
       User.findById(userId, function(errorid, currentUser) {
           if(currentUser){
               User.findOne({ "uniqueId" : uniqueId }, function (err, requester) {
@@ -167,8 +191,8 @@ function putFriendRequestToReciver(userId, data, socket) {
                         });
 
                         //to the user that approved
-                        jsonResponse = {result : 'OK'};
-                        socket.emit('acceptFriendRequestRespone', jsonResponse);
+                        //jsonResponse = {result : 'OK'};
+                        //socket.emit('acceptFriendRequestRespone', jsonResponse);
 
                          //to the user that sent the request
                         trySendNotificationIfConnected(currentUser, requester.uniqueId, tryFriendRequestAprrovalHelper);
@@ -200,7 +224,7 @@ function putFriendRequestToReciver(userId, data, socket) {
                         {
                             Counters.findOneAndUpdate({ name: "messagesCounter" }, { $inc: { counter : 1 }}, {"new":true, upsert:true}, function (err, result) 
                             {
-                                var areFriends = checkIfFriends(sender, reciever);
+                                var areFriends = checkIfFriends(sender, reciever.uniqueId);
 
                                 console.log('---------------------------'.green);
                                 console.log('are friends : ' + areFriends);
@@ -272,26 +296,6 @@ function putFriendRequestToReciver(userId, data, socket) {
            }
     }, 10000); //every 10 seconds we refresh the online users
     
-
-
-    function checkIfFriends(user1, user2) {
-        if (!user1.friends || !Array.isArray(user1.friends) || user1.friends.length === 0) {
-          console.log('no friends found'.green);
-          return false;
-        }
-
-        console.log(user1.friends);
-
-        for (var i = 0; i < user1.friends.length; i++) {
-            console.log('printing all friends uniqueid values : '.green);
-            console.log(user1.friends[i].uniqueId);
-            if(user1.friends[i].uniqueId == user2.uniqueId){
-              return true;
-            }
-        }
-
-        return false;
-    }
 
     function sendNewMessageRequestHelper (client, uniqueId, callback){
         client.get('id', function (err, id) {
